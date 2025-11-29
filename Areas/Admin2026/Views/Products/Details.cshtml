@@ -1,0 +1,94 @@
+﻿@model DoAn_web.Models.Product
+
+@{
+    ViewBag.Title = "Chi tiết Sản phẩm"; // 1. Tiêu đề rõ ràng
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+        <h5 class="mb-0">@ViewBag.Title: @Html.DisplayFor(model => model.ProductName)</h5>
+    </div>
+
+    <div class="card-body">
+
+        <dl class="row">
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.ProductName)
+            </dt>
+            <dd class="col-sm-9">
+                <p class="form-control-plaintext">@Html.DisplayFor(model => model.ProductName)</p>
+            </dd>
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.ProductImage)
+            </dt>
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrEmpty(Model.ProductImage))
+                {
+                    <img src="@Url.Content(Model.ProductImage)"
+                         alt="@Html.DisplayFor(model => model.ProductName)"
+                         style="max-width: 200px; max-height: 200px; border-radius: 5px; object-fit: cover;" />
+                }
+                else
+                {
+                    <span class="form-control-plaintext text-muted">Không có ảnh</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.ProductPrice)
+            </dt>
+            <dd class="col-sm-9">
+                <p class="form-control-plaintext">@(Model.ProductPrice.ToString("N0") + "đ")</p>
+            </dd>
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.Category.CategoryName)
+            </dt>
+
+            <dd class="col-sm-9">
+                <p class="form-control-plaintext">@Html.DisplayFor(model => model.Category.CategoryName)</p>
+            </dd>
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.ProductDecription)
+            </dt>
+            <dd class="col-sm-9">
+                <p class="form-control-plaintext">@Html.DisplayFor(model => model.ProductDecription)</p>
+            </dd>
+            <dt class="col-sm-3 col-form-label fw-bold">
+                Dung lượng (GB)
+            </dt>
+            <dd class="col-sm-9">
+                <p class="form-control-plaintext">
+                    @(Model.Storage != null ? Model.Storage.StorageName : "Không có")
+                </p>
+            </dd>
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                Màu sắc
+            </dt>
+            <dd class="col-sm-9">
+                <div class="form-control-plaintext">
+                    @if (Model.Color != null)
+                    {
+                        <span style="display:inline-block; width: 20px; height: 20px; background-color: @Model.Color.ColorCode; border: 1px solid #ccc; vertical-align: text-bottom; margin-right: 5px; border-radius: 50%;"></span>
+                        <span>@Model.Color.ColorName</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Không có</span>
+                    }
+                </div>
+            </dd>
+
+        </dl>
+
+    </div> <div class="card-footer bg-light">
+        @Html.ActionLink("Sửa", "Edit", new { id = Model.ProductID }, new { @class = "btn btn-warning" })
+        @Html.ActionLink("Quay về", "Index", null, new { @class = "btn btn-secondary ms-2" })
+    </div>
+</div>

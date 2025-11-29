@@ -1,0 +1,783 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="MyStore2026Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="CategoryID" />
+          </Key>
+          <Property Name="CategoryID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CategoryName" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Color">
+          <Key>
+            <PropertyRef Name="ColorID" />
+          </Key>
+          <Property Name="ColorID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ColorName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ColorCode" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Customer">
+          <Key>
+            <PropertyRef Name="CustomerID" />
+          </Key>
+          <Property Name="CustomerID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CustomerName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="CustomerPhone" Type="nvarchar" MaxLength="15" Nullable="false" />
+          <Property Name="CustomerEmail" Type="nvarchar(max)" />
+          <Property Name="CustomerAddress" Type="nvarchar(max)" />
+          <Property Name="Username" Type="nvarchar" MaxLength="255" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Discount">
+          <Key>
+            <PropertyRef Name="DiscountID" />
+          </Key>
+          <Property Name="DiscountID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DiscountName" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="DiscountType" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="DiscountValue" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="CouponCode" Type="nvarchar" MaxLength="50" />
+          <Property Name="StartDate" Type="datetime" Nullable="false" />
+          <Property Name="EndDate" Type="datetime" Nullable="false" />
+          <Property Name="MinimumOrderAmount" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="MaxDiscountAmount" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="FlashSaleItem">
+          <Key>
+            <PropertyRef Name="FlashSaleItemID" />
+          </Key>
+          <Property Name="FlashSaleItemID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProductID" Type="int" Nullable="false" />
+          <Property Name="SalePrice" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="SaleQuantityLimit" Type="int" Nullable="false" />
+          <Property Name="SoldQuantity" Type="int" Nullable="false" />
+          <Property Name="StartDate" Type="datetime" Nullable="false" />
+          <Property Name="EndDate" Type="datetime" Nullable="false" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Order">
+          <Key>
+            <PropertyRef Name="OrderID" />
+          </Key>
+          <Property Name="OrderID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CustomerID" Type="int" Nullable="false" />
+          <Property Name="OrderDate" Type="date" Nullable="false" />
+          <Property Name="TotalAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="PaymentStatus" Type="nvarchar(max)" />
+          <Property Name="AddressDelivery" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="ShippingStatus" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="DiscountID" Type="int" />
+          <Property Name="DiscountAmount" Type="decimal" Precision="18" Scale="2" />
+        </EntityType>
+        <EntityType Name="OrderDetail">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProductID" Type="int" Nullable="false" />
+          <Property Name="OrderID" Type="int" Nullable="false" />
+          <Property Name="Quantity" Type="int" Nullable="false" />
+          <Property Name="UnitPrice" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Product">
+          <Key>
+            <PropertyRef Name="ProductID" />
+          </Key>
+          <Property Name="ProductID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CategoryID" Type="int" Nullable="false" />
+          <Property Name="ProductName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="ProductDecription" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="ProductPrice" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ProductImage" Type="nvarchar(max)" />
+          <Property Name="Quantity" Type="int" Nullable="false" />
+          <Property Name="SoldQuantity" Type="int" Nullable="false" />
+          <Property Name="OldPrice" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="StorageID" Type="int" />
+          <Property Name="ColorID" Type="int" />
+        </EntityType>
+        <EntityType Name="ProductDetail">
+          <Key>
+            <PropertyRef Name="DetailID" />
+          </Key>
+          <Property Name="DetailID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProductID" Type="int" Nullable="false" />
+          <Property Name="SpecName" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="SpecValue" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="OrderIndex" Type="int" />
+        </EntityType>
+        <EntityType Name="Storage">
+          <Key>
+            <PropertyRef Name="StorageID" />
+          </Key>
+          <Property Name="StorageID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="StorageName" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Username" />
+          </Key>
+          <Property Name="Username" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Password" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="UserRole" Type="nchar" MaxLength="1" Nullable="false" />
+        </EntityType>
+        <Association Name="FK__Order__CustomerI__4CA06362">
+          <End Role="Customer" Type="Self.Customer" Multiplicity="1" />
+          <End Role="Order" Type="Self.Order" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Customer">
+              <PropertyRef Name="CustomerID" />
+            </Principal>
+            <Dependent Role="Order">
+              <PropertyRef Name="CustomerID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__OrderDeta__Order__4E88ABD4">
+          <End Role="Order" Type="Self.Order" Multiplicity="1" />
+          <End Role="OrderDetail" Type="Self.OrderDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Order">
+              <PropertyRef Name="OrderID" />
+            </Principal>
+            <Dependent Role="OrderDetail">
+              <PropertyRef Name="OrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__OrderDeta__Produ__4F7CD00D">
+          <End Role="Product" Type="Self.Product" Multiplicity="1" />
+          <End Role="OrderDetail" Type="Self.OrderDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="ProductID" />
+            </Principal>
+            <Dependent Role="OrderDetail">
+              <PropertyRef Name="ProductID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FlashSaleItem_Product">
+          <End Role="Product" Type="Self.Product" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="FlashSaleItem" Type="Self.FlashSaleItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="ProductID" />
+            </Principal>
+            <Dependent Role="FlashSaleItem">
+              <PropertyRef Name="ProductID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Order_Discount">
+          <End Role="Discount" Type="Self.Discount" Multiplicity="0..1" />
+          <End Role="Order" Type="Self.Order" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Discount">
+              <PropertyRef Name="DiscountID" />
+            </Principal>
+            <Dependent Role="Order">
+              <PropertyRef Name="DiscountID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Pro_Category">
+          <End Role="Category" Type="Self.Category" Multiplicity="1" />
+          <End Role="Product" Type="Self.Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="CategoryID" />
+            </Principal>
+            <Dependent Role="Product">
+              <PropertyRef Name="CategoryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Product_Color">
+          <End Role="Color" Type="Self.Color" Multiplicity="0..1" />
+          <End Role="Product" Type="Self.Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Color">
+              <PropertyRef Name="ColorID" />
+            </Principal>
+            <Dependent Role="Product">
+              <PropertyRef Name="ColorID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Product_Storage">
+          <End Role="Storage" Type="Self.Storage" Multiplicity="0..1" />
+          <End Role="Product" Type="Self.Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Storage">
+              <PropertyRef Name="StorageID" />
+            </Principal>
+            <Dependent Role="Product">
+              <PropertyRef Name="StorageID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductDetail_Product">
+          <End Role="Product" Type="Self.Product" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ProductDetail" Type="Self.ProductDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="ProductID" />
+            </Principal>
+            <Dependent Role="ProductDetail">
+              <PropertyRef Name="ProductID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_User_Customer">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="Customer" Type="Self.Customer" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Username" />
+            </Principal>
+            <Dependent Role="Customer">
+              <PropertyRef Name="Username" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="MyStore2026ModelStoreContainer">
+          <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Color" EntityType="Self.Color" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Customer" EntityType="Self.Customer" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Discount" EntityType="Self.Discount" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FlashSaleItem" EntityType="Self.FlashSaleItem" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Order" EntityType="Self.Order" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="OrderDetail" EntityType="Self.OrderDetail" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProductDetail" EntityType="Self.ProductDetail" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Storage" EntityType="Self.Storage" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__Order__CustomerI__4CA06362" Association="Self.FK__Order__CustomerI__4CA06362">
+            <End Role="Customer" EntitySet="Customer" />
+            <End Role="Order" EntitySet="Order" />
+          </AssociationSet>
+          <AssociationSet Name="FK__OrderDeta__Order__4E88ABD4" Association="Self.FK__OrderDeta__Order__4E88ABD4">
+            <End Role="Order" EntitySet="Order" />
+            <End Role="OrderDetail" EntitySet="OrderDetail" />
+          </AssociationSet>
+          <AssociationSet Name="FK__OrderDeta__Produ__4F7CD00D" Association="Self.FK__OrderDeta__Produ__4F7CD00D">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="OrderDetail" EntitySet="OrderDetail" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FlashSaleItem_Product" Association="Self.FK_FlashSaleItem_Product">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="FlashSaleItem" EntitySet="FlashSaleItem" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Order_Discount" Association="Self.FK_Order_Discount">
+            <End Role="Discount" EntitySet="Discount" />
+            <End Role="Order" EntitySet="Order" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Pro_Category" Association="Self.FK_Pro_Category">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="Product" EntitySet="Product" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Product_Color" Association="Self.FK_Product_Color">
+            <End Role="Color" EntitySet="Color" />
+            <End Role="Product" EntitySet="Product" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Product_Storage" Association="Self.FK_Product_Storage">
+            <End Role="Storage" EntitySet="Storage" />
+            <End Role="Product" EntitySet="Product" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductDetail_Product" Association="Self.FK_ProductDetail_Product">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="ProductDetail" EntitySet="ProductDetail" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User_Customer" Association="Self.FK_User_Customer">
+            <End Role="User" EntitySet="User" />
+            <End Role="Customer" EntitySet="Customer" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="MyStore2026Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="CategoryID" />
+          </Key>
+          <Property Name="CategoryID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CategoryName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Products" Relationship="MyStore2026Model.FK_Pro_Category" FromRole="Category" ToRole="Product" />
+        </EntityType>
+        <EntityType Name="Customer">
+          <Key>
+            <PropertyRef Name="CustomerID" />
+          </Key>
+          <Property Name="CustomerID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CustomerName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CustomerPhone" Type="String" MaxLength="15" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CustomerEmail" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CustomerAddress" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Username" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Orders" Relationship="Self.FK__Order__CustomerI__412EB0B6" FromRole="Customer" ToRole="Order" />
+          <NavigationProperty Name="User" Relationship="Self.FK_User_Customer" FromRole="Customer" ToRole="User" />
+        </EntityType>
+        <EntityType Name="Order">
+          <Key>
+            <PropertyRef Name="OrderID" />
+          </Key>
+          <Property Name="OrderID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CustomerID" Type="Int32" Nullable="false" />
+          <Property Name="OrderDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="TotalAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="PaymentStatus" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="AddressDelivery" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Customer" Relationship="Self.FK__Order__CustomerI__412EB0B6" FromRole="Order" ToRole="Customer" />
+          <NavigationProperty Name="OrderDetails" Relationship="Self.FK__OrderDeta__Order__44FF419A" FromRole="Order" ToRole="OrderDetail" />
+          <Property Name="ShippingStatus" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DiscountID" Type="Int32" />
+          <Property Name="DiscountAmount" Type="Decimal" Precision="18" Scale="2" />
+          <NavigationProperty Name="Discount" Relationship="MyStore2026Model.FK_Order_Discount" FromRole="Order" ToRole="Discount" />
+        </EntityType>
+        <EntityType Name="OrderDetail">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProductID" Type="Int32" Nullable="false" />
+          <Property Name="OrderID" Type="Int32" Nullable="false" />
+          <Property Name="Quantity" Type="Int32" Nullable="false" />
+          <Property Name="UnitPrice" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <NavigationProperty Name="Order" Relationship="Self.FK__OrderDeta__Order__44FF419A" FromRole="OrderDetail" ToRole="Order" />
+          <NavigationProperty Name="Product" Relationship="MyStore2026Model.FK__OrderDeta__Produ__4F7CD00D" FromRole="OrderDetail" ToRole="Product" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Username" />
+          </Key>
+          <Property Name="Username" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Password" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="UserRole" Type="String" MaxLength="1" FixedLength="true" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Customers" Relationship="Self.FK_User_Customer" FromRole="User" ToRole="Customer" />
+        </EntityType>
+        <Association Name="FK__Order__CustomerI__412EB0B6">
+          <End Role="Customer" Type="Self.Customer" Multiplicity="1" />
+          <End Role="Order" Type="Self.Order" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Customer">
+              <PropertyRef Name="CustomerID" />
+            </Principal>
+            <Dependent Role="Order">
+              <PropertyRef Name="CustomerID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_User_Customer">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="Customer" Type="Self.Customer" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Username" />
+            </Principal>
+            <Dependent Role="Customer">
+              <PropertyRef Name="Username" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__OrderDeta__Order__44FF419A">
+          <End Role="Order" Type="Self.Order" Multiplicity="1" />
+          <End Role="OrderDetail" Type="Self.OrderDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Order">
+              <PropertyRef Name="OrderID" />
+            </Principal>
+            <Dependent Role="OrderDetail">
+              <PropertyRef Name="OrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="MyStore2026Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Categories" EntityType="Self.Category" />
+          <EntitySet Name="Customers" EntityType="Self.Customer" />
+          <EntitySet Name="Orders" EntityType="Self.Order" />
+          <EntitySet Name="OrderDetails" EntityType="Self.OrderDetail" />
+          <EntitySet Name="Users" EntityType="Self.User" />
+          <AssociationSet Name="FK__Order__CustomerI__412EB0B6" Association="Self.FK__Order__CustomerI__412EB0B6">
+            <End Role="Customer" EntitySet="Customers" />
+            <End Role="Order" EntitySet="Orders" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User_Customer" Association="Self.FK_User_Customer">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Customer" EntitySet="Customers" />
+          </AssociationSet>
+          <AssociationSet Name="FK__OrderDeta__Order__44FF419A" Association="Self.FK__OrderDeta__Order__44FF419A">
+            <End Role="Order" EntitySet="Orders" />
+            <End Role="OrderDetail" EntitySet="OrderDetails" />
+          </AssociationSet>
+          <EntitySet Name="Discounts" EntityType="MyStore2026Model.Discount" />
+          <EntitySet Name="FlashSaleItems" EntityType="MyStore2026Model.FlashSaleItem" />
+          <AssociationSet Name="FK_Order_Discount" Association="MyStore2026Model.FK_Order_Discount">
+            <End Role="Discount" EntitySet="Discounts" />
+            <End Role="Order" EntitySet="Orders" />
+          </AssociationSet>
+          <EntitySet Name="Colors" EntityType="MyStore2026Model.Color" />
+          <EntitySet Name="Storages" EntityType="MyStore2026Model.Storage" />
+          <EntitySet Name="Products" EntityType="MyStore2026Model.Product" />
+          <AssociationSet Name="FK_Pro_Category" Association="MyStore2026Model.FK_Pro_Category">
+            <End Role="Category" EntitySet="Categories" />
+            <End Role="Product" EntitySet="Products" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Product_Color" Association="MyStore2026Model.FK_Product_Color">
+            <End Role="Color" EntitySet="Colors" />
+            <End Role="Product" EntitySet="Products" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FlashSaleItem_Product" Association="MyStore2026Model.FK_FlashSaleItem_Product">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="FlashSaleItem" EntitySet="FlashSaleItems" />
+          </AssociationSet>
+          <AssociationSet Name="FK__OrderDeta__Produ__4F7CD00D" Association="MyStore2026Model.FK__OrderDeta__Produ__4F7CD00D">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="OrderDetail" EntitySet="OrderDetails" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Product_Storage" Association="MyStore2026Model.FK_Product_Storage">
+            <End Role="Storage" EntitySet="Storages" />
+            <End Role="Product" EntitySet="Products" />
+          </AssociationSet>
+          <EntitySet Name="ProductDetails" EntityType="MyStore2026Model.ProductDetail" />
+          <AssociationSet Name="FK_ProductDetail_Product" Association="MyStore2026Model.FK_ProductDetail_Product">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="ProductDetail" EntitySet="ProductDetails" />
+          </AssociationSet>
+          </EntityContainer>
+        <EntityType Name="Discount">
+          <Key>
+            <PropertyRef Name="DiscountID" />
+          </Key>
+          <Property Name="DiscountID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DiscountName" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="DiscountType" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DiscountValue" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+          <Property Name="CouponCode" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="MinimumOrderAmount" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="MaxDiscountAmount" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Orders" Relationship="MyStore2026Model.FK_Order_Discount" FromRole="Discount" ToRole="Order" />
+        </EntityType>
+        <EntityType Name="FlashSaleItem">
+          <Key>
+            <PropertyRef Name="FlashSaleItemID" />
+          </Key>
+          <Property Name="FlashSaleItemID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProductID" Type="Int32" Nullable="false" />
+          <Property Name="SalePrice" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+          <Property Name="SaleQuantityLimit" Type="Int32" Nullable="false" />
+          <Property Name="SoldQuantity" Type="Int32" Nullable="false" />
+          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Product" Relationship="MyStore2026Model.FK_FlashSaleItem_Product" FromRole="FlashSaleItem" ToRole="Product" />
+        </EntityType>
+        <Association Name="FK_Order_Discount">
+          <End Type="MyStore2026Model.Discount" Role="Discount" Multiplicity="0..1" />
+          <End Type="MyStore2026Model.Order" Role="Order" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Discount">
+              <PropertyRef Name="DiscountID" />
+            </Principal>
+            <Dependent Role="Order">
+              <PropertyRef Name="DiscountID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Color">
+          <Key>
+            <PropertyRef Name="ColorID" />
+          </Key>
+          <Property Name="ColorID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ColorName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ColorCode" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Products" Relationship="MyStore2026Model.FK_Product_Color" FromRole="Color" ToRole="Product" />
+        </EntityType>
+        <EntityType Name="Storage">
+          <Key>
+            <PropertyRef Name="StorageID" />
+          </Key>
+          <Property Name="StorageID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StorageName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Products" Relationship="MyStore2026Model.FK_Product_Storage" FromRole="Storage" ToRole="Product" />
+        </EntityType>
+        <EntityType Name="Product">
+          <Key>
+            <PropertyRef Name="ProductID" />
+          </Key>
+          <Property Name="ProductID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CategoryID" Type="Int32" Nullable="false" />
+          <Property Name="ProductName" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ProductDecription" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ProductPrice" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+          <Property Name="ProductImage" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Quantity" Type="Int32" Nullable="false" />
+          <Property Name="SoldQuantity" Type="Int32" Nullable="false" />
+          <Property Name="OldPrice" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="StorageID" Type="Int32" />
+          <Property Name="ColorID" Type="Int32" />
+          <NavigationProperty Name="Category" Relationship="MyStore2026Model.FK_Pro_Category" FromRole="Product" ToRole="Category" />
+          <NavigationProperty Name="Color" Relationship="MyStore2026Model.FK_Product_Color" FromRole="Product" ToRole="Color" />
+          <NavigationProperty Name="FlashSaleItems" Relationship="MyStore2026Model.FK_FlashSaleItem_Product" FromRole="Product" ToRole="FlashSaleItem" />
+          <NavigationProperty Name="OrderDetails" Relationship="MyStore2026Model.FK__OrderDeta__Produ__4F7CD00D" FromRole="Product" ToRole="OrderDetail" />
+          <NavigationProperty Name="Storage" Relationship="MyStore2026Model.FK_Product_Storage" FromRole="Product" ToRole="Storage" />
+          <NavigationProperty Name="ProductDetails" Relationship="MyStore2026Model.FK_ProductDetail_Product" FromRole="Product" ToRole="ProductDetail" />
+        </EntityType>
+        <Association Name="FK_Pro_Category">
+          <End Type="MyStore2026Model.Category" Role="Category" Multiplicity="1" />
+          <End Type="MyStore2026Model.Product" Role="Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="CategoryID" />
+            </Principal>
+            <Dependent Role="Product">
+              <PropertyRef Name="CategoryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Product_Color">
+          <End Type="MyStore2026Model.Color" Role="Color" Multiplicity="0..1" />
+          <End Type="MyStore2026Model.Product" Role="Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Color">
+              <PropertyRef Name="ColorID" />
+            </Principal>
+            <Dependent Role="Product">
+              <PropertyRef Name="ColorID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FlashSaleItem_Product">
+          <End Type="MyStore2026Model.Product" Role="Product" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="MyStore2026Model.FlashSaleItem" Role="FlashSaleItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="ProductID" />
+            </Principal>
+            <Dependent Role="FlashSaleItem">
+              <PropertyRef Name="ProductID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__OrderDeta__Produ__4F7CD00D">
+          <End Type="MyStore2026Model.Product" Role="Product" Multiplicity="1" />
+          <End Type="MyStore2026Model.OrderDetail" Role="OrderDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="ProductID" />
+            </Principal>
+            <Dependent Role="OrderDetail">
+              <PropertyRef Name="ProductID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Product_Storage">
+          <End Type="MyStore2026Model.Storage" Role="Storage" Multiplicity="0..1" />
+          <End Type="MyStore2026Model.Product" Role="Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Storage">
+              <PropertyRef Name="StorageID" />
+            </Principal>
+            <Dependent Role="Product">
+              <PropertyRef Name="StorageID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ProductDetail">
+          <Key>
+            <PropertyRef Name="DetailID" />
+          </Key>
+          <Property Name="DetailID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProductID" Type="Int32" Nullable="false" />
+          <Property Name="SpecName" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SpecValue" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="OrderIndex" Type="Int32" />
+          <NavigationProperty Name="Product" Relationship="MyStore2026Model.FK_ProductDetail_Product" FromRole="ProductDetail" ToRole="Product" />
+        </EntityType>
+        <Association Name="FK_ProductDetail_Product">
+          <End Type="MyStore2026Model.Product" Role="Product" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="MyStore2026Model.ProductDetail" Role="ProductDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="ProductID" />
+            </Principal>
+            <Dependent Role="ProductDetail">
+              <PropertyRef Name="ProductID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="MyStore2026ModelStoreContainer" CdmEntityContainer="MyStore2026Entities">
+          <EntitySetMapping Name="Categories">
+            <EntityTypeMapping TypeName="MyStore2026Model.Category">
+              <MappingFragment StoreEntitySet="Category">
+                <ScalarProperty Name="CategoryID" ColumnName="CategoryID" />
+                <ScalarProperty Name="CategoryName" ColumnName="CategoryName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Customers">
+            <EntityTypeMapping TypeName="MyStore2026Model.Customer">
+              <MappingFragment StoreEntitySet="Customer">
+                <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
+                <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
+                <ScalarProperty Name="CustomerPhone" ColumnName="CustomerPhone" />
+                <ScalarProperty Name="CustomerEmail" ColumnName="CustomerEmail" />
+                <ScalarProperty Name="CustomerAddress" ColumnName="CustomerAddress" />
+                <ScalarProperty Name="Username" ColumnName="Username" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Orders">
+            <EntityTypeMapping TypeName="MyStore2026Model.Order">
+              <MappingFragment StoreEntitySet="Order">
+                <ScalarProperty Name="DiscountAmount" ColumnName="DiscountAmount" />
+                <ScalarProperty Name="DiscountID" ColumnName="DiscountID" />
+                <ScalarProperty Name="ShippingStatus" ColumnName="ShippingStatus" />
+                <ScalarProperty Name="OrderID" ColumnName="OrderID" />
+                <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
+                <ScalarProperty Name="OrderDate" ColumnName="OrderDate" />
+                <ScalarProperty Name="TotalAmount" ColumnName="TotalAmount" />
+                <ScalarProperty Name="PaymentStatus" ColumnName="PaymentStatus" />
+                <ScalarProperty Name="AddressDelivery" ColumnName="AddressDelivery" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OrderDetails">
+            <EntityTypeMapping TypeName="MyStore2026Model.OrderDetail">
+              <MappingFragment StoreEntitySet="OrderDetail">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="ProductID" ColumnName="ProductID" />
+                <ScalarProperty Name="OrderID" ColumnName="OrderID" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="UnitPrice" ColumnName="UnitPrice" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="MyStore2026Model.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="UserRole" ColumnName="UserRole" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Discounts">
+            <EntityTypeMapping TypeName="MyStore2026Model.Discount">
+              <MappingFragment StoreEntitySet="Discount">
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="MaxDiscountAmount" ColumnName="MaxDiscountAmount" />
+                <ScalarProperty Name="MinimumOrderAmount" ColumnName="MinimumOrderAmount" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="CouponCode" ColumnName="CouponCode" />
+                <ScalarProperty Name="DiscountValue" ColumnName="DiscountValue" />
+                <ScalarProperty Name="DiscountType" ColumnName="DiscountType" />
+                <ScalarProperty Name="DiscountName" ColumnName="DiscountName" />
+                <ScalarProperty Name="DiscountID" ColumnName="DiscountID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FlashSaleItems">
+            <EntityTypeMapping TypeName="MyStore2026Model.FlashSaleItem">
+              <MappingFragment StoreEntitySet="FlashSaleItem">
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="SoldQuantity" ColumnName="SoldQuantity" />
+                <ScalarProperty Name="SaleQuantityLimit" ColumnName="SaleQuantityLimit" />
+                <ScalarProperty Name="SalePrice" ColumnName="SalePrice" />
+                <ScalarProperty Name="ProductID" ColumnName="ProductID" />
+                <ScalarProperty Name="FlashSaleItemID" ColumnName="FlashSaleItemID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Colors">
+            <EntityTypeMapping TypeName="MyStore2026Model.Color">
+              <MappingFragment StoreEntitySet="Color">
+                <ScalarProperty Name="ColorCode" ColumnName="ColorCode" />
+                <ScalarProperty Name="ColorName" ColumnName="ColorName" />
+                <ScalarProperty Name="ColorID" ColumnName="ColorID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Storages">
+            <EntityTypeMapping TypeName="MyStore2026Model.Storage">
+              <MappingFragment StoreEntitySet="Storage">
+                <ScalarProperty Name="StorageName" ColumnName="StorageName" />
+                <ScalarProperty Name="StorageID" ColumnName="StorageID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Products">
+            <EntityTypeMapping TypeName="MyStore2026Model.Product">
+              <MappingFragment StoreEntitySet="Product">
+                <ScalarProperty Name="ColorID" ColumnName="ColorID" />
+                <ScalarProperty Name="StorageID" ColumnName="StorageID" />
+                <ScalarProperty Name="OldPrice" ColumnName="OldPrice" />
+                <ScalarProperty Name="SoldQuantity" ColumnName="SoldQuantity" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="ProductImage" ColumnName="ProductImage" />
+                <ScalarProperty Name="ProductPrice" ColumnName="ProductPrice" />
+                <ScalarProperty Name="ProductDecription" ColumnName="ProductDecription" />
+                <ScalarProperty Name="ProductName" ColumnName="ProductName" />
+                <ScalarProperty Name="CategoryID" ColumnName="CategoryID" />
+                <ScalarProperty Name="ProductID" ColumnName="ProductID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProductDetails">
+            <EntityTypeMapping TypeName="MyStore2026Model.ProductDetail">
+              <MappingFragment StoreEntitySet="ProductDetail">
+                <ScalarProperty Name="OrderIndex" ColumnName="OrderIndex" />
+                <ScalarProperty Name="SpecValue" ColumnName="SpecValue" />
+                <ScalarProperty Name="SpecName" ColumnName="SpecName" />
+                <ScalarProperty Name="ProductID" ColumnName="ProductID" />
+                <ScalarProperty Name="DetailID" ColumnName="DetailID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -1,0 +1,10 @@
+﻿@model IEnumerable<DoAn_web.Models.Product>
+     @*chi lap va taoo ra danh sach sp da dc loc*@
+@foreach (var item in Model)
+{
+    <a href="@Url.Action("Details", "Product", new {id=item.ProductID}) class="search-result-item"">
+        <img src="@Url.Content(item.ProductImage)" width="30" />
+             @item.ProductName
+    </a>
+
+}            

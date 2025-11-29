@@ -1,0 +1,343 @@
+﻿
+@using DoAn_web.Models
+@model DoAn_web.ViewModels.HomeViewModel
+@{
+    ViewBag.Title = "Trang chủ";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+    var flashSaleList = ViewBag.FlashSaleProducts as List<DoAn_web.Models.Product>;
+    var flashSaleItems = ViewBag.FlashSales as List<DoAn_web.Models.FlashSaleItem>;
+    string endTimeStr = "";
+
+    if (flashSaleItems != null && flashSaleItems.Count > 0)
+    {
+        // Lấy EndDate của item đầu tiên
+        // Dùng định dạng yyyy-MM-ddTHH:mm:ss (Ví dụ: 2025-11-28T15:30:00)
+        // Đây là định dạng duy nhất JS hiểu chính xác trên mọi trình duyệt
+        endTimeStr = flashSaleItems.First().EndDate.ToString("yyyy-MM-ddTHH:mm:ss");
+    }
+
+
+}
+<link href="~/Content/style_K/Style_home.css" rel="stylesheet" />
+<link href="~/Content/style_K/Style_silder.css" rel="stylesheet" />
+<link href="~/Content/style_K/Style_FlashSale.css" rel="stylesheet" />
+<section class="banner-section">
+    <div class="slider">
+        <div class="slides">
+            <div class="slide" onclick="window.location.href=''">
+                <img src="~/Content/img/banner.png">
+            </div>
+            <div class="slide" onclick="window.location.href=''">
+                <img src="~/Content/img/banner1.png">
+            </div>
+            <div class="slide" onclick="window.location.href=''">
+                <img src="~/Content/img/banner2.png">
+            </div>
+            @*<div class="slide" onclick="window.location.href=''">
+                    <img src="~/Content/img/banner3.jpg" style="width:1200px;height:450px">
+                </div>*@
+        </div>
+
+        @*Nút điều hướng*@
+        <button class="prev">&#10094;</button>
+        <button class="next">&#10095;</button>
+
+        @*dau cham*@
+        <div class="dots"></div>
+    </div>
+</section>
+<script src="~/Content/js/js_banner.js"></script>
+
+@*Flash sale*@
+@if (flashSaleList != null && flashSaleList.Count > 0)
+{
+    <div class="flash-sale-container">
+        @*hieu thi tieu de + dong ho*@
+        <div class="flash-sale-header">
+            <div class="flash-title">
+                <img src="https://cdn-icons-png.flaticon.com/512/3655/3655580.png" alt="Flash" /> @* Icon tia sét *@
+                FLASH SALE
+            </div>
+            <div class="countdown-timer">
+                <span>Kết thúc trong:</span>
+                <span class="countdown-box" id="h">00</span> :
+                <span class="countdown-box" id="m">00</span> :
+                <span class="countdown-box" id="s">00</span>
+            </div>
+        </div>
+        @*Danh sach san pham*@
+        <div class="flash-sale-body">
+            @foreach (var p in flashSaleList)
+            {
+                // tim thong tin flash sale
+                var saleItem = flashSaleItems.FirstOrDefault(f => f.ProductID == p.ProductID);
+                decimal salePrice = saleItem != null ? saleItem.SalePrice : p.ProductPrice;
+                // tinh theo %
+                int discountPercent = (int)((p.ProductPrice - salePrice) / p.ProductPrice * 100);
+                <a href="@Url.Action("Details", "Product", new { id = p.ProductID })" style="text-decoration:none; color: inherit;">
+                    <div class="flash-product-item">
+                        @*nhan % tren sp*@
+                        <div style="position: absolute; top: 0; right: 0; background-color: #ffd839; color: #ee4d2d; font-weight: bold; font-size: 12px; padding: 2px 5px;">
+                            -@discountPercent%
+                        </div>
+
+                        <img src="@Url.Content(p.ProductImage)" style="width: 150px; height: 150px; object-fit: contain;" />
+
+                        <div style="height: 40px; overflow: hidden; font-size: 14px; margin: 10px 0;">
+                            @p.ProductName
+                        </div>
+
+                        <div style="color: #ee4d2d; font-size: 18px; font-weight: bold;">
+                            @String.Format("{0:N0}", salePrice) đ
+                        </div>
+                        <div style="text-decoration: line-through; color: #999; font-size: 12px;">
+                            @String.Format("{0:N0}", p.ProductPrice) đ
+                        </div>
+                        @* trang thai ban*@
+                        <div class="flash-price-bar">
+                            <div class="sold-progress" style="width: @(saleItem.SoldQuantity * 100 / saleItem.SaleQuantityLimit)%"></div>
+                            <span class="sold-text">Đã bán @saleItem.SoldQuantity</span>
+
+                        </div>
+                    </div>
+                </a>
+
+            }
+        </div>
+    </div>
+
+}
+<script>
+    // 1. Nhận chuỗi ngày tháng chuẩn ISO từ C#
+    var endTimeString = "@endTimeStr";
+
+    // In ra console để kiểm tra (Bấm F12 -> Console để xem nếu vẫn lỗi)
+    console.log("Countdown Time: " + endTimeString);
+
+    if (endTimeString && endTimeString !== "") {
+
+        // JavaScript đọc định dạng ISO rất chuẩn
+        var countDownDate = new Date(endTimeString).getTime();
+
+        var x = setInterval(function() {
+            var now = new Date().getTime();
+            var distance = countDownDate - now;
+
+            // Tính toán giờ, phút, giây
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Sửa lỗi NaN: Nếu tính ra NaN hoặc Âm thì gán bằng 0
+            if (isNaN(hours) || hours < 0) hours = 0;
+            if (isNaN(minutes) || minutes < 0) minutes = 0;
+            if (isNaN(seconds) || seconds < 0) seconds = 0;
+
+            // Thêm số 0 đằng trước cho đẹp
+            document.getElementById("h").innerHTML = hours < 10 ? "0" + hours : hours;
+            document.getElementById("m").innerHTML = minutes < 10 ? "0" + minutes : minutes;
+            document.getElementById("s").innerHTML = seconds < 10 ? "0" + seconds : seconds;
+
+            // Nếu hết giờ
+            if (distance < 0) {
+                clearInterval(x);
+                document.querySelector(".countdown-timer").innerHTML = "ĐÃ KẾT THÚC";
+            }
+        }, 1000);
+    } else {
+        // Trường hợp không có dữ liệu ngày tháng
+        document.querySelector(".countdown-timer").innerHTML = "";
+    }
+</script>
+
+
+@* --- BẮT ĐẦU PHẦN IPHONE --- *@
+<div class="category-section">
+    <h2 class="category-title">IPhone</h2>
+
+    <div class="row">
+        @foreach (var product in Model.Iphones)
+        {
+            // 1. Logic kiểm tra xem sản phẩm này có trong danh sách Flash Sale không
+            // Biến flashSaleItems đã được khai báo ở đầu file (dòng 9)
+            var saleItem = flashSaleItems != null ? flashSaleItems.FirstOrDefault(x => x.ProductID == product.ProductID) : null;
+
+            // 2. Tính toán giá hiển thị
+            decimal currentPrice = product.ProductPrice; // Mặc định là giá gốc
+            int discountPercent = 0;
+
+            if (saleItem != null)
+            {
+                currentPrice = saleItem.SalePrice; // Nếu có sale thì lấy giá sale
+                if (product.ProductPrice > 0)
+                {
+                    discountPercent = (int)((product.ProductPrice - saleItem.SalePrice) / product.ProductPrice * 100);
+                }
+            }
+
+            //Chia 4 cot
+            <div class="col-md-3">
+                <a class="home-product-link" href="@Url.Action("Details", "Product", new { id = product.ProductID })">
+
+                    @* Thêm position: relative để làm mốc toạ độ cho cái tem *@
+                    <div class="home-product-card" style="position: relative;">
+
+                        @* --- CODE MỚI: TEM GIẢM GIÁ --- *@
+                        @if (saleItem != null && discountPercent > 0)
+                        {
+                            <div style="position: absolute; top: 0; right: 0; background-color: #ffd839; color: #ee4d2d; font-weight: bold; font-size: 12px; padding: 4px 8px; border-bottom-left-radius: 5px; z-index: 5;">
+                                -@discountPercent%
+                            </div>
+                        }
+                        @* ----------------------------- *@
+
+                        <img src="@Url.Content(product.ProductImage)" alt="@product.ProductName" class="home-product-image" />
+
+                        <h5 class="home-product-name">@product.ProductName</h5>
+
+                        @* --- CODE MỚI: LOGIC HIỂN THỊ GIÁ --- *@
+                        @if (saleItem != null)
+                        {
+                            @* Nếu đang sale: Hiện giá đỏ sale + giá gốc gạch ngang *@
+                            <div class="home-product-price">
+                                <span style="color: #ee4d2d; font-weight: bold;">
+                                    @String.Format("{0:N0}", currentPrice) đ
+                                </span>
+                                <span style="text-decoration: line-through; color: #999; font-size: 13px; margin-left: 5px; font-weight: normal;">
+                                    @String.Format("{0:N0}", product.ProductPrice) đ
+                                </span>
+                            </div>
+                        }
+                        else
+                        {
+                            @* Nếu không sale: Hiện giá gốc bình thường *@
+                            <p class="home-product-price">@String.Format("{0:N0}", product.ProductPrice) đ</p>
+                        }
+                        @* ------------------------------------ *@
+
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+    <div class="view-more-container">
+        <a href="@Url.Action("TrangIphone", "Default")" class="view-more-btn">Xem tất cả iPhone ></a>
+    </div>
+</div>
+@* --- KẾT THÚC PHẦN IPHONE --- *@
+
+
+
+
+@*trang ipad*@
+
+<div class="category-section">
+    <h2 class="category-title">Ipad</h2>
+    <div class="row">
+        @foreach (var product in Model.Ipads)
+        {
+            //Chia 4 cot
+            <div class="col-md-3">
+                <a class="home-product-link" href="@Url.Action("Details", "Product", new { id = product.ProductID })">
+                    <div class="home-product-card">
+
+                        <img src="@Url.Content(product.ProductImage)" alt="@product.ProductName" class="home-product-image" />
+
+                        <h5 class="home-product-name">@product.ProductName</h5>
+
+                        <p class="home-product-price">@String.Format("{0:N0}", product.ProductPrice) đ</p>
+
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+    <div class="view-more-container">
+        <a href="@Url.Action("TrangIpad", "Default")" class="view-more-btn">Xem tất cả Ipad ></a>
+    </div>
+</div>
+@*trang Mac*@
+
+<div class="category-section">
+    <h2 class="category-title">MacBook</h2>
+    <div class="row">
+        @foreach (var product in Model.Macs)
+        {
+            //Chia 4 cot
+            <div class="col-md-3">
+                <a class="home-product-link" href="@Url.Action("Details", "Product", new { id = product.ProductID })">
+                    <div class="home-product-card">
+
+                        <img src="@Url.Content(product.ProductImage)" alt="@product.ProductName" class="home-product-image" />
+
+                        <h5 class="home-product-name">@product.ProductName</h5>
+
+                        <p class="home-product-price">@String.Format("{0:N0}", product.ProductPrice) đ</p>
+
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+    <div class="view-more-container">
+        <a href="@Url.Action("TrangMac", "Default")" class="view-more-btn">Xem tất cả Macbook ></a>
+    </div>
+</div>
+@* trang watch*@
+
+<div class="category-section">
+    <h2 class="category-title">Watch</h2>
+    <div class="row">
+        @foreach (var product in Model.Watches)
+        {
+            //Chia 4 cot
+            <div class="col-md-3">
+                <a class="home-product-link" href="@Url.Action("Details", "Product", new { id = product.ProductID })">
+                    <div class="home-product-card">
+
+                        <img src="@Url.Content(product.ProductImage)" alt="@product.ProductName" class="home-product-image" />
+
+                        <h5 class="home-product-name">@product.ProductName</h5>
+
+                        <p class="home-product-price">@String.Format("{0:N0}", product.ProductPrice) đ</p>
+
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+    <div class="view-more-container">
+        <a href="@Url.Action("TrangWatch", "Default")" class="view-more-btn">Xem tất cả Watch ></a>
+    </div>
+</div>
+
+
+@* trang PhuKien*@
+
+<div class="category-section">
+    <h2 class="category-title">Phu Kien</h2>
+    <div class="row">
+        @foreach (var product in Model.PhuKiens)
+        {
+            //Chia 4 cot
+            <div class="col-md-3">
+                <a class="home-product-link" href="@Url.Action("Details", "Product", new { id = product.ProductID })">
+                    <div class="home-product-card">
+
+                        <img src="@Url.Content(product.ProductImage)" alt="@product.ProductName" class="home-product-image" />
+
+                        <h5 class="home-product-name">@product.ProductName</h5>
+
+                        <p class="home-product-price">@String.Format("{0:N0}", product.ProductPrice) đ</p>
+
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+    <div class="view-more-container">
+        <a href="@Url.Action("PhuKien", "Default")" class="view-more-btn">Xem tất cả Watch ></a>
+    </div>
+</div>
+
+

@@ -1,0 +1,206 @@
+﻿@* File: /Views/Cart/Index.cshtml *@
+@model List<DoAn_web.Models.CartItem>
+
+@{
+    ViewBag.Title = "Giỏ hàng của bạn";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+<link href="~/Content/style_K/Style_GioHang.css" rel="stylesheet" />
+
+<div class="cart-container">
+    <h2>Giỏ hàng của bạn</h2>
+
+    @* HIỂN THỊ THÔNG BÁO LỖI NẾU CÓ *@
+    @if (TempData["Error"] != null)
+    {
+        <div style="background-color: #fff3cd; color: #856404; padding: 10px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #ffeeba;">
+            @TempData["Error"]
+        </div>
+    }
+
+    @* KIỂM TRA GIỎ HÀNG TRỐNG *@
+    @if (Model == null || Model.Count == 0)
+    {
+        <div style="text-align: center; padding: 50px 20px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+
+            <img src="https://deo.shopeemobile.com/shopee/shopee-pcmall-live-sg/assets/9bdd8040b334d31946f49e36beaf32db.png" alt="Empty Cart" style="width: 100px; opacity: 0.5;">
+
+            <p style="font-size: 18px; color: #666; margin: 0;">Giỏ hàng của bạn đang trống.</p>
+
+            <a href="@Url.Action("Index", "Default")" class="checkout-btn" style="background: #333; text-decoration: none; display: inline-block; min-width: 200px;">
+                Tiếp tục mua sắm
+            </a>
+
+        </div>
+    }
+    else
+    {
+        decimal totalAmount = 0;
+
+        foreach (var item in Model)
+        {
+            if (item != null)
+            {
+                totalAmount += item.TotalPrice;
+
+                // --- LOGIC TÍNH % GIẢM GIÁ ---
+                // Chỉ hiển thị giảm giá nếu Giá gốc > Giá bán hiện tại
+                bool isDiscounted = item.OriginalPrice > item.UnitPrice;
+                int percent = 0;
+                if (item.OriginalPrice > 0 && isDiscounted)
+                {
+                    percent = (int)((item.OriginalPrice - item.UnitPrice) / item.OriginalPrice * 100);
+                }
+                // -----------------------------
+
+                <div class="cart-item">
+                    <a href="@Url.Action("Details", "Product", new { id = item.ProductID })">
+                        <img src="@Url.Content(item.ProductImage)" alt="@item.ProductName" />
+                    </a>
+
+                    <div class="cart-item-info">
+                        <a href="@Url.Action("Details", "Product", new { id = item.ProductID })" style="text-decoration: none;">
+                            <h4>@item.ProductName</h4>
+                        </a>
+
+                        <div style="margin-bottom: 12px;">
+                            @if (isDiscounted)
+                            {
+                                @* Trường hợp có GIẢM GIÁ / FLASH SALE *@
+                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                    <span style="color: #d70018; font-weight: bold; font-size: 16px;">
+                                        @String.Format("{0:N0}", item.UnitPrice) đ
+                                    </span>
+                                    <span style="text-decoration: line-through; color: #999; font-size: 13px;">
+                                        @String.Format("{0:N0}", item.OriginalPrice) đ
+                                    </span>
+                                    <span style="background: #ffd839; color: #d70018; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: bold;">
+                                        -@percent%
+                                    </span>
+                                </div>
+                            }
+                            else
+                            {
+                                @* Trường hợp GIÁ THƯỜNG *@
+                                <p style="margin: 0; color: #333; font-weight: 500;">
+                                    Đơn giá: @String.Format("{0:N0}", item.UnitPrice) đ
+                                </p>
+                            }
+                        </div>
+
+                        @* --- CỤM SỐ LƯỢNG DÙNG AJAX --- *@
+                        <div class="cart-qty-wrapper" data-product-id="@item.ProductID">
+                            <span class="cart-qty-label">Số lượng:</span>
+
+                            <div class="cart-qty-box">
+                                <button type="button"
+                                        class="cart-qty-btn btn-minus"
+                                        data-change="-1">
+                                    −
+                                </button>
+
+                                <span class="cart-qty-display"
+                                      id="qty-@item.ProductID">@item.Quantity</span>
+
+                                    <button type="button"
+                                            class="cart-qty-btn btn-plus"
+                                            data-change="1">
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cart-item-price">
+                            <h5 id="item-total-@item.ProductID">
+                                @String.Format("{0:N0}", item.TotalPrice) đ
+                            </h5>
+
+                            <a href="@Url.Action("RemoveFromCart", "Cart", new { productID = item.ProductID })"
+                               onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
+                                <i class="fa fa-trash"></i> Xóa
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+
+            <div class="cart-total">
+                Tổng thanh toán: <span style="color: #d70018;">@String.Format("{0:N0}", totalAmount) đ</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                <a href="@Url.Action("Index", "Default")" style="color: #666; text-decoration: none; font-weight: 500;">
+                    <i class="fa fa-arrow-left"></i> Tiếp tục mua hàng
+                </a>
+
+                <a href="@Url.Action("Checkout", "Cart")" class="checkout-btn">
+                    MUA HÀNG NGAY
+                </a>
+            </div>
+        }
+</div>
+@* ------- SCRIPT AJAX TĂNG / GIẢM SỐ LƯỢNG ------- *@
+<script>
+    function callChangeQuantity(productId, change) {
+        var body = "productID=" + encodeURIComponent(productId)
+                 + "&change=" + encodeURIComponent(change);
+
+        fetch('@Url.Action("ChangeQuantityAjax", "Cart")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
+            body: body
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+            if (!data.success) {
+                alert(data.message || 'Có lỗi khi cập nhật giỏ hàng');
+                return;
+            }
+
+            // Cập nhật số lượng
+            var qtySpan = document.getElementById('qty-' + data.productID);
+            if (qtySpan) {
+                qtySpan.textContent = data.quantity;
+            }
+
+            // Cập nhật thành tiền từng sản phẩm
+            var itemTotal = document.getElementById('item-total-' + data.productID);
+            if (itemTotal) {
+                itemTotal.textContent = data.itemTotal.toLocaleString('vi-VN') + ' đ';
+            }
+
+            // Cập nhật tổng tiền giỏ
+            var cartTotal = document.getElementById('cart-total');
+            if (cartTotal) {
+                cartTotal.textContent = data.cartTotal.toLocaleString('vi-VN') + ' đ';
+            }
+        })
+        .catch(function (err) {
+            console.error(err);
+            alert('Lỗi kết nối server');
+        });
+    }
+
+    // Lắng nghe click nút +/-
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('cart-qty-btn')) {
+            var wrapper = e.target.closest('.cart-qty-wrapper');
+            var productId = wrapper.getAttribute('data-product-id');
+            var change = parseInt(e.target.getAttribute('data-change'));
+
+            var qtySpan = document.getElementById('qty-' + productId);
+            var currentQty = parseInt(qtySpan.textContent) || 1;
+
+            // Không cho giảm xuống dưới 1
+            if (currentQty <= 1 && change < 0) {
+                return;
+            }
+
+            callChangeQuantity(productId, change);
+        }
+    });
+</script>

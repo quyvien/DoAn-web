@@ -1,0 +1,58 @@
+﻿@model DoAn_web.Models.Category
+
+@{
+    // 1. Đặt lại tiêu đề cho rõ ràng
+    ViewBag.Title = "Thêm danh mục mới";
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+            <div class="row mb-3">
+
+                @Html.LabelFor(model => model.CategoryName, "Tên danh mục", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+
+                <div class="col-sm-10">
+                    @Html.EditorFor(model => model.CategoryName, new { htmlAttributes = new { @class = "form-control" } })
+
+                    @Html.ValidationMessageFor(model => model.CategoryName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-10 offset-sm-2">
+                    <input type="submit" value="Tạo mới" class="btn btn-primary" />
+
+                    @Html.ActionLink("Quay về", "Index", null, new { @class = "btn btn-secondary ms-2" })
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+
+
+@*### 🎨 Giải thích các thay đổi
+
+* **Layout (`<div class="card">
+    `):** Form được bọc trong `card` và `card-body` để tạo khung và đổ bóng nhẹ, đồng bộ với trang `Index`.
+    * **Form ngang (Horizontal Form):**
+    * Các lớp `form-horizontal`, `form-group` của Bootstrap 3 đã bị loại bỏ.
+    * Thay vào đó, chúng ta dùng cấu trúc `row` của Bootstrap 5.
+    * Mỗi trường nhập liệu là một `<div class="row mb-3">
+        ` (thêm khoảng cách `mb-3`).
+        * **Label (Nhãn):**
+        * `control-label col-md-2` (BS3) được đổi thành `col-sm-2 col-form-label` (BS5). Class `col-form-label` rất quan trọng, nó giúp căn giữa label với ô nhập liệu.
+        * Tôi thêm class `fw-bold` (font-weight: bold) cho nhãn nổi bật hơn.
+        * **Nút bấm:**
+        * `col-md-offset-2` (BS3) được đổi thành `offset-sm-2` (BS5) để đẩy nút bấm về bên phải, thẳng hàng với các ô nhập liệu.
+        * Nút "Create" được đổi class từ `btn-default` (cũ) thành `btn-primary` (màu xanh).
+        * Link "Back to List" được chuyển lên nằm cạnh nút "Tạo mới" và đổi thành class `btn-btn-secondary` (màu xám) cho chuyên nghiệp hơn.*@

@@ -1,0 +1,413 @@
+﻿/* ---------------------------------------------------- */
+/* CSS CHO LAYOUT RESPONSIVE (Sử dụng Flexbox) */
+/* ---------------------------------------------------- */
+.detail-flex-container {
+    display: flex;
+    flex-wrap: wrap; /* Cho phép các cột xuống hàng trên mobile */
+    gap: 30px; /* Khoảng cách giữa các cột */
+    padding: 30px 15px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.column-left {
+    flex: 1 1 40%; /* Chiếm khoảng 40% trên desktop */
+    max-width: 450px; /* Giới hạn chiều rộng cho hình ảnh */
+}
+
+.column-right {
+    flex: 1 1 55%; /* Chiếm khoảng 55% trên desktop */
+}
+
+.product-image-box {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.product-detail-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 6px;
+}
+
+.product-name {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.product-price {
+    font-size: 28px;
+    color: #d9534f; /* Màu đỏ nổi bật */
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* ---------------- SẢN PHẨM TƯƠNG TỰ ----------------- */
+.related-products-wrapper {
+    max-width: 1200px;
+    margin: 40px auto 20px auto;
+    padding: 0 15px 30px 15px;
+}
+
+.related-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.related-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.related-item {
+    flex: 1 1 calc(25% - 20px); /* 4 sp 1 hàng trên desktop */
+    max-width: calc(25% - 20px);
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #fff;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .related-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    }
+
+    .related-item img {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+    }
+
+.related-item-name {
+    font-size: 14px;
+    font-weight: 500;
+    min-height: 40px;
+    margin-bottom: 8px;
+}
+
+.related-item-price {
+    font-size: 15px;
+    font-weight: 600;
+    color: #007bff;
+    margin-bottom: 5px;
+}
+
+.related-item-old-price {
+    font-size: 13px;
+    color: #999;
+    text-decoration: line-through;
+}
+
+/* ---------------- MUA KÈM GIÁ SỐC ------------------- */
+.combo-wrapper {
+    max-width: 1200px;
+    margin: 40px auto 0 auto;
+    padding: 0 15px 30px 15px;
+}
+
+.combo-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.combo-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.combo-main-product {
+    flex: 0 0 260px;
+    text-align: center;
+}
+
+    .combo-main-product img {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+    }
+
+.combo-main-name {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.combo-main-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111;
+}
+
+.combo-plus {
+    font-size: 32px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 40px;
+    align-self: center; /* để dấu + nằm giữa hàng */
+}
+
+.combo-items {
+    flex: 1 1 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.combo-item {
+    flex: 1 1 calc(33.333% - 20px); /* 3 sp 1 hàng */
+    max-width: calc(33.333% - 20px);
+    border-radius: 12px;
+    border: 1px solid #eee;
+    background-color: #fff;
+    padding: 16px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .combo-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    }
+
+    .combo-item img {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+    }
+
+.combo-item-name {
+    font-size: 14px;
+    font-weight: 500;
+    min-height: 40px;
+    margin-bottom: 8px;
+}
+
+.combo-item-price-label {
+    font-size: 13px;
+    color: #666;
+}
+
+.combo-item-price {
+    font-size: 15px;
+    font-weight: 600;
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.combo-item-button {
+    border: 1px solid #007bff;
+    background-color: #fff;
+    color: #007bff;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+    .combo-item-button:hover {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+/* Khung tổng tiền */
+.combo-summary {
+    flex: 0 0 260px;
+    border-radius: 16px;
+    background-color: #f5f5f7;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.combo-summary-title {
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.combo-summary-price {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.combo-summary-count {
+    font-size: 13px;
+    color: #666;
+}
+.combo-summary-button {
+    margin-top: 16px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+}
+
+    .combo-summary-button:hover {
+        opacity: 0.9;
+    }
+
+/* ================== RESPONSIVE ================== */
+
+/* Tablet dọc / mobile to */
+@media (max-width: 768px) {
+    .column-left, .column-right {
+        flex-basis: 100%; /* Mỗi cột chiếm toàn bộ chiều rộng */
+        max-width: 100%;
+    }
+}
+
+/* Tablet ngang (<= 992px) */
+@media (max-width: 992px) {
+    .related-item {
+        flex: 1 1 calc(50% - 20px);
+        max-width: calc(50% - 20px);
+    }
+
+    .combo-item {
+        flex: 1 1 calc(50% - 20px);
+        max-width: calc(50% - 20px);
+    }
+
+    .combo-inner {
+        flex-wrap: wrap;
+    }
+
+    .combo-summary {
+        flex: 1 1 100%;
+        margin-top: 10px;
+    }
+}
+
+/* Mobile nhỏ (<= 576px) */
+@media (max-width: 576px) {
+    .related-item {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+
+    .combo-inner {
+        gap: 20px;
+    }
+
+    .combo-main-product {
+        flex: 1 1 100%;
+    }
+
+    .combo-plus {
+        display: none;
+    }
+
+    .combo-item {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+}
+.spec-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.spec-label { /* Class này dùng cho phần trên */
+    width: 100px;
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.spec-value-box {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    border: 1px solid #0071e3;
+    background-color: #f5f9ff;
+    color: #0071e3;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: default;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,113,227,0.1);
+}
+
+.color-dot {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* ========================================= */
+/* 2. CSS CHO BẢNG THÔNG SỐ KỸ THUẬT (Ở DƯỚI)*/
+/* ========================================= */
+.specs-section {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 15px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.specs-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.simple-specs-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .simple-specs-table td {
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 15px;
+        color: #333;
+        vertical-align: top;
+    }
+
+/* ĐỔI TÊN CLASS: .spec-label -> .table-label để không bị trùng */
+.table-label {
+    font-weight: 700;
+    width: 35%;
+    padding-right: 15px;
+}
+
+/* ĐỔI TÊN CLASS: .spec-value -> .table-value */
+.table-value {
+    font-weight: 400;
+    color: #333;
+}
+
+.simple-specs-table tr:last-child td {
+    border-bottom: none;
+}

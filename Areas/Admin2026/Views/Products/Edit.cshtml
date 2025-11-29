@@ -1,0 +1,202 @@
+﻿@model DoAn_web.Models.Product
+
+@{
+    ViewBag.Title = "Chỉnh sửa Sản phẩm";
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0">@ViewBag.Title: @Model.ProductName</h5>
+    </div>
+
+    <div class="card-body">
+
+        @using (Html.BeginForm("Edit", "Products", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+            @Html.HiddenFor(model => model.ProductID)
+            @* Dòng HiddenField này rất QUAN TRỌNG để Controller lấy được đường dẫn ảnh cũ nếu không upload ảnh mới *@
+            @Html.HiddenFor(model => model.ProductImage)
+
+            <div class="row mb-3">
+                @Html.LabelFor(model => model.CategoryID, "Danh mục", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+                <div class="col-sm-10">
+                    @Html.DropDownList("CategoryID", null, "--- Chọn danh mục ---", htmlAttributes: new { @class = "form-select" })
+                    @Html.ValidationMessageFor(model => model.CategoryID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                @Html.LabelFor(model => model.ProductName, "Tên sản phẩm", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+                <div class="col-sm-10">
+                    @Html.EditorFor(model => model.ProductName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.ProductName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                @Html.LabelFor(model => model.ProductDecription, "Mô tả", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+                <div class="col-sm-10">
+                    @Html.TextAreaFor(model => model.ProductDecription, new { @class = "form-control", rows = 5 })
+                    @Html.ValidationMessageFor(model => model.ProductDecription, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                @Html.LabelFor(model => model.ProductPrice, "Giá bán", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+                <div class="col-sm-10">
+                    @* ✅ FIX: Xóa type="number" để tránh xung đột định dạng số giữa trình duyệt và server *@
+                    @Html.EditorFor(model => model.ProductPrice, new { htmlAttributes = new { @class = "form-control", @step = "1000" } })
+                    @Html.ValidationMessageFor(model => model.ProductPrice, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <h5 class="mt-4 mb-3 text-primary">Quản lý Kho hàng</h5>
+
+            <div class="row mb-3">
+                @Html.LabelFor(model => model.Quantity, "Số lượng tồn kho", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+                <div class="col-sm-10">
+                    @* ✅ FIX: Xóa type="number" để tránh mất dữ liệu khi validation thất bại *@
+                    @Html.EditorFor(model => model.Quantity, new { htmlAttributes = new { @class = "form-control", @min = "0" } })
+                    @Html.ValidationMessageFor(model => model.Quantity, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                @Html.LabelFor(model => model.SoldQuantity, "Số lượng đã bán", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+                <div class="col-sm-10">
+                    @* Trường này chỉ để xem, khóa lại để bảo vệ số liệu thống kê *@
+                    @Html.EditorFor(model => model.SoldQuantity, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly", @style = "background-color: #f8f9fa; border: 1px solid #dee2e6;" } })
+                    @Html.ValidationMessageFor(model => model.SoldQuantity, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="row mb-3" id="containerStorage">
+                @Html.LabelFor(model => model.StorageID, "Dung lượng (GB)", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+                <div class="col-sm-10">
+                    @Html.DropDownList("StorageID", null, "--- Chọn dung lượng ---", htmlAttributes: new { @class = "form-select" })
+                    @Html.ValidationMessageFor(model => model.StorageID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row mb-3" id="containerColor">
+                @Html.LabelFor(model => model.ColorID, "Màu sắc", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+                <div class="col-sm-10">
+                    @Html.DropDownList("ColorID", null, "--- Chọn màu sắc ---", htmlAttributes: new { @class = "form-select" })
+                    @Html.ValidationMessageFor(model => model.ColorID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label fw-bold">Hình ảnh</label>
+                <div class="col-sm-10">
+                    <label for="ImageFile" class="form-label">Chọn ảnh mới (bỏ trống nếu không muốn đổi)</label>
+                    <input type="file" name="ImageFile" id="ImageFile" class="form-control" accept="image/*" />
+
+                    <div class="mt-3">
+                        <strong>Ảnh hiện tại:</strong><br>
+                        <img id="imagePreview"
+                             src="@(string.IsNullOrEmpty(Model.ProductImage) ? "" : Url.Content(Model.ProductImage))"
+                             alt="Xem trước"
+                             style="max-width: 200px; max-height: 200px; margin-top: 15px; border-radius: 5px; @(string.IsNullOrEmpty(Model.ProductImage) ? "display: none;" : "display: block;")" />
+
+                        @if (string.IsNullOrEmpty(Model.ProductImage))
+                        {
+                            <span id="noImageText">Chưa có ảnh.</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-10 offset-sm-2">
+                    <input type="submit" value="Lưu thay đổi" class="btn btn-primary" />
+                    @Html.ActionLink("Quay về", "Index", null, new { @class = "btn btn-secondary ms-2" })
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        // ==========================================
+        // 1. XỬ LÝ ẨN/HIỆN GB VÀ MÀU THEO DANH MỤC
+        // ==========================================
+        function toggleAttributes() {
+            var categorySelect = document.getElementById("CategoryID");
+            if (!categorySelect) return;
+
+            var categoryId = categorySelect.value;
+
+            // Danh sách ID danh mục KHÔNG CẦN GB và MÀU
+            // 9=Phụ kiện, 11=Gia dụng, 12=Camera, 13=Âm thanh
+            var noSpecCategories = ["9", "11", "12", "13"];
+
+            var divStorage = document.getElementById("containerStorage");
+            var divColor = document.getElementById("containerColor");
+            var dropStorage = document.getElementById("StorageID");
+            var dropColor = document.getElementById("ColorID");
+
+            // Chỉ chạy nếu các thẻ này tồn tại trên trang
+            if (divStorage && divColor && dropStorage && dropColor) {
+
+                // Nếu ID danh mục nằm trong danh sách "miễn nhiễm"
+                if (noSpecCategories.includes(categoryId)) {
+                    // Ẩn đi
+                    divStorage.style.display = "none";
+                    divColor.style.display = "none";
+
+                    // Reset giá trị chọn về rỗng để khi lưu vào DB là NULL
+                    dropStorage.value = "";
+                    dropColor.value = "";
+                } else {
+                    // Hiện lại (cho Điện thoại, Laptop...)
+                    divStorage.style.display = "flex";
+                    divColor.style.display = "flex";
+                }
+            }
+        }
+
+        // Chạy hàm này ngay khi trang vừa tải xong (để xử lý trường hợp trang Edit load lên)
+        document.addEventListener("DOMContentLoaded", function () {
+            toggleAttributes();
+        });
+
+        // Chạy hàm này mỗi khi người dùng đổi danh mục
+        document.getElementById("CategoryID").addEventListener("change", function () {
+            toggleAttributes();
+        });
+
+
+        // ==========================================
+        // 2. XỬ LÝ ẢNH PREVIEW
+        // ==========================================
+        document.getElementById("ImageFile").addEventListener("change", function (event) {
+            var preview = document.getElementById("imagePreview");
+            var noImageText = document.getElementById("noImageText");
+            var file = event.target.files[0];
+
+            if (file) {
+                var objectUrl = URL.createObjectURL(file);
+                preview.src = objectUrl;
+                preview.style.display = "block"; // Hiện ảnh
+
+                // Nếu có dòng chữ "Chưa có ảnh" thì ẩn nó đi
+                if (noImageText) {
+                    noImageText.style.display = "none";
+                }
+
+                // Giải phóng bộ nhớ sau khi load xong
+                preview.onload = function () {
+                    URL.revokeObjectURL(preview.src);
+                }
+            }
+        });
+    </script>
+}
+

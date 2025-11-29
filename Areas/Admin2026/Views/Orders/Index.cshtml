@@ -1,0 +1,104 @@
+﻿@model IEnumerable<DoAn_web.Models.Order> 
+
+@{
+    ViewBag.Title = "Quản lý Đơn hàng";
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h2 class="mb-4 text-primary">Quản lý Đơn hàng</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@* --- KHỐI TÌM KIẾM VÀ LỌC --- *@
+@using (Html.BeginForm("Index", "Orders", FormMethod.Get, new { @class = "mb-4 d-flex align-items-center" }))
+{
+    <div class="input-group" style="width: 350px;">
+        <input type="text"
+               name="searchString"
+               value="@ViewBag.CurrentFilter"
+               placeholder="Tìm kiếm theo Mã ĐH/Tên khách hàng..."
+               class="form-control" />
+        <button type="submit" class="btn btn-primary">Tìm</button>
+    </div>
+
+    @* Gửi lại tham số sắp xếp cũ *@
+    @Html.Hidden("sortOrder", (string)ViewBag.CurrentSort)
+
+    @Html.ActionLink("Reset", "Index", null, new { @class = "btn btn-secondary ms-3" })
+}
+@* ----------------------------- *@
+
+
+<div class="card shadow-sm">
+    <div class="card-body">
+
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Mã ĐH</th>
+                    <th>Khách hàng</th>
+
+                    @* SẮP XẾP: Click vào header để sắp xếp *@
+                    
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Địa chỉ</th>
+                    <th>Thanh toán</th>
+                    <th>Vận chuyển</th>
+                    <th class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    // Fix CS1963: Gán cho biến cục bộ
+                    var currentOrder = item;
+                    <tr>
+                        <td>#@currentOrder.OrderID</td>
+                        <td>
+                            @if (currentOrder.Customer != null)
+                            {
+                                <span>@currentOrder.Customer.CustomerName</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted fw-bold">(Khách hàng không tồn tại)</span>
+                            }
+                        </td>
+                        <td>@currentOrder.OrderDate.ToString("dd/MM/yyyy")</td>
+                        <td class="fw-bold text-danger">@String.Format("{0:N0}", currentOrder.TotalAmount) đ</td>
+                        <td>@currentOrder.AddressDelivery</td>
+
+                        <td>
+                            <span class="badge @(currentOrder.PaymentStatus != null && currentOrder.PaymentStatus.Contains("Đã") ? "bg-success" : "bg-warning text-dark")">
+                                @currentOrder.PaymentStatus
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="badge @(currentOrder.ShippingStatus != null && currentOrder.ShippingStatus.Contains("thành công") ? "bg-primary" : (currentOrder.ShippingStatus != null && currentOrder.ShippingStatus.Contains("Hủy") ? "bg-danger" : "bg-info text-dark"))">
+                                @currentOrder.ShippingStatus
+                            </span>
+                        </td>
+
+                        <td class="text-end">
+                            @Html.ActionLink("Sửa TT", "Edit", new { id = currentOrder.OrderID }, new { @class = "btn btn-sm btn-primary" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@* --- KHỐI THÔNG TIN ĐẾM (THAY THẾ PHÂN TRANG) --- *@
+<div class="d-flex justify-content-end align-items-center mt-3">
+
+    <div class="text-muted small">
+        Tổng số đơn hàng: @Model.Count()
+    </div>
+
+</div>

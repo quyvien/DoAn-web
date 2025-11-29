@@ -1,0 +1,84 @@
+﻿/* File: /Content/style_K/ProductList.css */
+
+/* =================================== */
+/* CSS RIÊNG cho Trang Danh Sách */
+/* =================================== */
+.product-list-container {
+    margin-top: 15px; /* Đẩy xuống dưới Header */
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+.list-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+/* --- Lưới Sản Phẩm (Dùng Flexbox) --- */
+.product-grid {
+    display: flex;
+    flex-wrap: wrap; /* Cho phép tự xuống hàng */
+    margin: 0 -10px; /* Tạo khoảng cách 2 bên */
+}
+
+/* --- 1 Cột (Mỗi sản phẩm) --- */
+.product-grid-item {
+    width: 25%; /* 4 cột trên desktop (100 / 4 = 25) */
+    padding: 0 10px; /* Khoảng cách giữa các cột */
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+/* --- CSS cho Thẻ Sản Phẩm (Giữ nguyên) --- */
+.home-product-card {
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    padding: 15px;
+    height: 100%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    text-align: center;
+}
+.home-product-link {
+    text-decoration: none;
+    color: #333;
+}
+.home-product-link:hover .home-product-card {
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+.home-product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+.home-product-name {
+    font-weight: bold;
+    font-size: 14px;
+    height: 40px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+.home-product-price {
+    color: #007bff; 
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+/* --- CSS RESPONSIVE (Quan trọng) --- */
+@media (max-width: 992px) {
+    .product-grid-item {
+        width: 50%; /* 2 cột trên tablet */
+    }
+}
+@media (max-width: 576px) {
+    .product-grid-item {
+        width: 100%; /* 1 cột trên mobile */
+    }
+}

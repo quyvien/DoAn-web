@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="82a1d65285c74f46b677e0cfa8f6ffc3" Name="Diagram1" ZoomLevel="63">
+        <EntityTypeShape EntityType="MyStore2026Model.Category" Width="1.5" PointX="0.75" PointY="1.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="MyStore2026Model.Customer" Width="1.5" PointX="0.75" PointY="5" IsExpanded="true" />
+        <EntityTypeShape EntityType="MyStore2026Model.Order" Width="1.5" PointX="13.375" PointY="6.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="MyStore2026Model.OrderDetail" Width="1.5" PointX="11.5" PointY="2" IsExpanded="true" />
+        <EntityTypeShape EntityType="MyStore2026Model.User" Width="1.5" PointX="6" PointY="6.875" IsExpanded="true" />
+        <AssociationConnector Association="MyStore2026Model.FK__Order__CustomerI__412EB0B6" ManuallyRouted="false" />
+        <AssociationConnector Association="MyStore2026Model.FK_User_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="MyStore2026Model.FK__OrderDeta__Order__44FF419A" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="MyStore2026Model.Discount" Width="1.5" PointX="11.125" PointY="9.25" />
+        <EntityTypeShape EntityType="MyStore2026Model.FlashSaleItem" Width="1.5" PointX="10.625" PointY="5.375" />
+        <AssociationConnector Association="MyStore2026Model.FK_Order_Discount" />
+        <EntityTypeShape EntityType="MyStore2026Model.Color" Width="1.5" PointX="6.125" PointY="4.5" />
+        <EntityTypeShape EntityType="MyStore2026Model.Storage" Width="1.5" PointX="6.125" PointY="2.125" />
+        <EntityTypeShape EntityType="MyStore2026Model.Product" Width="1.5" PointX="8.375" PointY="1.75" />
+        <AssociationConnector Association="MyStore2026Model.FK_Pro_Category" />
+        <AssociationConnector Association="MyStore2026Model.FK_Product_Color" />
+        <AssociationConnector Association="MyStore2026Model.FK_FlashSaleItem_Product" />
+        <AssociationConnector Association="MyStore2026Model.FK__OrderDeta__Produ__4F7CD00D" />
+        <AssociationConnector Association="MyStore2026Model.FK_Product_Storage" />
+        <EntityTypeShape EntityType="MyStore2026Model.ProductDetail" Width="1.5" PointX="10.625" PointY="13.75" />
+        <AssociationConnector Association="MyStore2026Model.FK_ProductDetail_Product" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

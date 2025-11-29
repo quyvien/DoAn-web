@@ -1,0 +1,167 @@
+﻿/* =================================== */
+/* CSS RIÊNG cho Trang Checkout */
+/* File: /Content/style_K/Style_Checkout.css */
+/* =================================== */
+
+.checkout-container {
+    margin-top: 150px; /* Đẩy xuống dưới header */
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+}
+
+    .checkout-container h2 {
+        text-align: center;
+        font-weight: bold;
+        font-size: 32px;
+        margin-bottom: 20px;
+    }
+
+/* Bố cục 2 cột */
+.checkout-row {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+/* CỘT TRÁI (TÓM TẮT) */
+.checkout-col-summary {
+    width: 55%; /* Cho cột trái 55% */
+    padding-right: 30px;
+    box-sizing: border-box;
+}
+
+    .checkout-col-summary h4 {
+        font-size: 20px;
+        font-weight: bold;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+
+/* Từng món hàng trong tóm tắt */
+.checkout-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5px; /* Tăng padding */
+    border-bottom: 1px solid #f0f0f0; /* Viền mờ */
+    font-size: 15px;
+}
+
+    .checkout-item span {
+        color: #333;
+    }
+
+    .checkout-item strong {
+        font-size: 16px;
+        font-weight: bold;
+        color: #000;
+    }
+
+/* TỔNG CỘNG (bên trái) */
+.checkout-total {
+    text-align: right;
+    font-size: 26px; /* Làm chữ to rõ */
+    font-weight: bold;
+    margin-top: 20px;
+    padding-top: 20px;
+    color: #d70018; /* Màu đỏ */
+    border-top: 2px solid #333; /* Thêm viền đậm phân cách */
+}
+
+
+/* CỘT PHẢI (ĐỊA CHỈ) */
+.checkout-col-address {
+    width: 45%; /* Cho cột phải 45% */
+    padding: 25px; /* Tăng padding */
+    box-sizing: border-box;
+    background-color: #f9f9f9; /* Nền xám nhạt */
+    border: 1px solid #ddd;
+    border-radius: 8px; /* Bo góc */
+}
+
+    .checkout-col-address h4 {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    .checkout-col-address p {
+        font-size: 16px;
+        line-height: 1.6; /* Giãn dòng */
+        margin-bottom: 10px;
+    }
+
+/* --- CSS cho Form (Lấy từ trang Đăng ký) --- */
+.form-row {
+    margin-bottom: 20px;
+}
+
+.custom-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.custom-input {
+    width: 100%;
+    padding: 12px; /* Làm ô input cao hơn */
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Quan trọng, để padding không làm vỡ */
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+    .custom-input:focus {
+        border-color: #007bff; /* Hiệu ứng khi click vào */
+        box-shadow: 0 0 5px rgba(0,123,255,0.3);
+        outline: none;
+    }
+
+.custom-button.button-success {
+    width: 100%;
+    padding: 15px; /* Làm nút to, rõ ràng */
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    .custom-button.button-success:hover {
+        background-color: #218838;
+    }
+/* Thông báo lỗi (nếu có) */
+.text-danger {
+    color: #d70018;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+
+/* --- Responsive (Cho điện thoại) --- */
+@media (max-width: 768px) {
+    .checkout-col-summary,
+    .checkout-col-address {
+        width: 100%; /* Chuyển 2 cột thành 1 cột */
+        padding: 0;
+    }
+
+    .checkout-col-address {
+        margin-top: 30px; /* Thêm khoảng cách khi xếp chồng */
+    }
+}
+.qr-chuyen-khoan {
+    width: 60%; /* Chiều rộng bạn muốn */
+    height: 50%; /* Chiều cao BẰNG chiều rộng */
+
+    object-fit: cover; /* Cắt ảnh để lấp đầy khung mà không méo */
+    object-position: center 20%; /* (Mẹo) Căn chỉnh vị trí để QR lọt vào giữa */
+}

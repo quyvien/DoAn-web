@@ -1,0 +1,178 @@
+﻿@model DoAn_web.Models.Order
+
+@{
+    ViewBag.Title = "Xử lý đơn hàng #" + Model.OrderID;
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+
+    // Danh sách trạng thái (Giữ nguyên logic của bạn)
+    var paymentStatuses = new List<SelectListItem> {
+        new SelectListItem { Text = "Chờ xử lý", Value = "Chờ xử lý" },
+        new SelectListItem { Text = "Đã thanh toán", Value = "Đã thanh toán" },
+        new SelectListItem { Text = "Đã hủy", Value = "Đã hủy" }
+    };
+
+    var shippingStatuses = new List<SelectListItem> {
+        new SelectListItem { Text = "Chờ lấy hàng", Value = "Chờ lấy hàng" },
+        new SelectListItem { Text = "Đang vận chuyển", Value = "Đang vận chuyển" },
+        new SelectListItem { Text = "Đã giao thành công", Value = "Đã giao thành công" },
+        new SelectListItem { Text = "Đã hủy", Value = "Đã hủy" }
+    };
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+<style>
+    .order-paper {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    .section-title {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #6c757d;
+        font-weight: 700;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #f8f9fa;
+        padding-bottom: 10px;
+    }
+
+    .total-price-box {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px dashed #dee2e6;
+    }
+
+    .price-lg {
+        font-size: 1.8rem;
+        color: #dc3545;
+        font-weight: 800;
+    }
+
+    .table-products thead th {
+        background-color: #f1f3f5;
+        border-bottom: none;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="mb-0 fw-bold text-dark">
+                <i class="fas fa-file-invoice me-2 text-primary"></i>Đơn hàng #@Model.OrderID
+            </h3>
+            <span class="text-muted small">Ngày đặt: @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</span>
+        </div>
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "Vui lòng kiểm tra lại:", new { @class = "alert alert-danger shadow-sm border-0" })
+
+        @Html.HiddenFor(model => model.OrderID)
+        @Html.HiddenFor(model => model.CustomerID)
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="order-paper h-100 p-4">
+
+                    <div class="mb-5">
+                        <div class="section-title"><i class="fas fa-box-open me-2"></i>Chi tiết sản phẩm</div>
+                        <div class="table-responsive">
+                            <table class="table table-products align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Sản phẩm</th>
+                                        <th class="text-center" width="15%">SL</th>
+                                        <th class="text-end" width="20%">Đơn giá</th>
+                                        <th class="text-end" width="20%">Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.OrderDetails != null)
+                                    {
+                                        foreach (var detail in ViewBag.OrderDetails)
+                                        {
+                                            <tr>
+                                                <td class="fw-bold text-primary">@detail.Product.ProductName</td>
+                                                <td class="text-center"><span class="badge bg-light text-dark border">x @detail.Quantity</span></td>
+                                                <td class="text-end text-muted">@String.Format("{0:N0}", detail.UnitPrice)</td>
+                                                <td class="text-end fw-bold">@String.Format("{0:N0}", (detail.Quantity * detail.UnitPrice)) ₫</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="section-title"><i class="fas fa-user me-2"></i>Khách hàng</div>
+                            <div class="ps-2 border-start border-3 border-info">
+                                <p class="mb-1 fw-bold">@Model.Customer.CustomerName</p>
+                                <p class="mb-1 small"><i class="fas fa-phone-alt me-2 text-muted"></i>@Model.Customer.CustomerPhone</p>
+                                <p class="mb-0 small"><i class="fas fa-envelope me-2 text-muted"></i>@Model.Customer.CustomerEmail</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="section-title"><i class="fas fa-truck me-2"></i>Giao hàng tới</div>
+                            <div class="ps-2 border-start border-3 border-warning">
+                                <p class="mb-0">@Model.AddressDelivery</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="order-paper p-4 sticky-top" style="top: 20px; z-index: 1;">
+
+                    <div class="section-title text-center text-primary">Tác vụ quản lý</div>
+
+                    <div class="total-price-box mb-4">
+                        <div class="text-muted small text-uppercase fw-bold">Tổng giá trị đơn hàng</div>
+                        <div class="price-lg">@String.Format("{0:N0}", Model.TotalAmount) ₫</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">TRẠNG THÁI THANH TOÁN</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-money-bill-wave text-success"></i></span>
+                            @Html.DropDownListFor(model => model.PaymentStatus, new SelectList(paymentStatuses, "Value", "Text", Model.PaymentStatus), new { @class = "form-select fw-bold" })
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted">TRẠNG THÁI VẬN CHUYỂN</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-shipping-fast text-info"></i></span>
+                            @Html.DropDownListFor(model => model.ShippingStatus, new SelectList(shippingStatuses, "Value", "Text", Model.ShippingStatus), new { @class = "form-select fw-bold" })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.ShippingStatus, "", new { @class = "text-danger small mt-1 d-block" })
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
+                            <i class="fas fa-save me-2"></i>CẬP NHẬT ĐƠN HÀNG
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+</div>

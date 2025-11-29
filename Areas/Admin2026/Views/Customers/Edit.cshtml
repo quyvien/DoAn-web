@@ -1,0 +1,93 @@
+﻿@model DoAn_web.Models.Customer
+
+@{
+    ViewBag.Title = "Sửa thông tin khách hàng";
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-primary fw-bold">
+            <i class="fas fa-user-edit me-2"></i>Sửa Khách Hàng
+        </h3>
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark fw-bold">
+                    <i class="fas fa-info-circle me-1"></i> Thông tin cá nhân
+                </div>
+
+                <div class="card-body p-4">
+                    @using (Html.BeginForm())
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                        @Html.HiddenFor(model => model.CustomerID)
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">TÀI KHOẢN ĐĂNG NHẬP (USERNAME)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-user-lock"></i></span>
+                                @Html.EditorFor(model => model.Username, new { htmlAttributes = new { @class = "form-control bg-light", @readonly = "readonly" } })
+                            </div>
+                            <small class="text-muted fst-italic">* Tên đăng nhập không thể thay đổi tại đây.</small>
+                        </div>
+
+                        <hr class="my-4 text-muted">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Họ và Tên Khách hàng</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="fas fa-user"></i></span>
+                                @Html.EditorFor(model => model.CustomerName, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập họ tên đầy đủ" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.CustomerName, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Số điện thoại</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-phone"></i></span>
+                                    @Html.EditorFor(model => model.CustomerPhone, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập số điện thoại" } })
+                                </div>
+                                @Html.ValidationMessageFor(model => model.CustomerPhone, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-envelope"></i></span>
+                                    @Html.EditorFor(model => model.CustomerEmail, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập địa chỉ Email" } })
+                                </div>
+                                @Html.ValidationMessageFor(model => model.CustomerEmail, "", new { @class = "text-danger small" })
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Địa chỉ giao hàng mặc định</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="fas fa-map-marker-alt"></i></span>
+                                @Html.TextAreaFor(model => model.CustomerAddress, new { @class = "form-control", rows = "3", placeholder = "Số nhà, tên đường, phường/xã..." })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.CustomerAddress, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="@Url.Action("Index")" class="btn btn-light me-md-2">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-primary fw-bold px-4">
+                                <i class="fas fa-save me-2"></i> Lưu Thay Đổi
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,110 @@
+﻿/* =================================== */
+/* CONTAINER TRANG DANH SÁCH */
+/* =================================== */
+.product-list-container {
+    margin-top: 150px;
+    margin-bottom: 40px;
+    width: 100%;
+    max-width: 1240px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+.list-title {
+    text-align: center;
+    font-size: 30px;
+    font-weight: 750;
+    margin-bottom: 35px;
+}
+
+/* =================================== */
+/* GRID HIỂN THỊ 4 CỘT */
+/* =================================== */
+.product-grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -12px;
+}
+
+.product-grid-item {
+    width: 25%;
+    padding: 0 12px;
+    margin-bottom: 24px;
+    box-sizing: border-box;
+}
+
+/* =================================== */
+/* PRODUCT CARD */
+/* =================================== */
+.home-product-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.home-product-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #e6e8ec;
+    padding: 18px;
+    transition: .25s;
+    height: 100%;
+    cursor: pointer;
+}
+
+    .home-product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 14px 26px rgba(0, 0, 0, 0.15);
+    }
+
+/* IMAGE */
+.home-product-image {
+    width: 100%;
+    height: 250px;
+    object-fit: contain;
+    margin-bottom: 14px;
+}
+
+/* NAME 2 DÒNG */
+.home-product-name {
+    font-size: 17px;
+    font-weight: 650;
+    text-align: center;
+    height: 46px;
+    line-height: 22px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+/* PRICE */
+.home-product-price {
+    font-size: 20px;
+    font-weight: 750;
+    color: #006aff;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+/* =================================== */
+/* RESPONSIVE */
+/* =================================== */
+@media (max-width: 992px) {
+    .product-grid-item {
+        width: 50%; /* 2 cột */
+    }
+
+    .home-product-image {
+        height: 230px;
+    }
+}
+
+@media (max-width: 576px) {
+    .product-grid-item {
+        width: 100%; /* 1 cột */
+    }
+
+    .home-product-image {
+        height: 200px;
+    }
+}

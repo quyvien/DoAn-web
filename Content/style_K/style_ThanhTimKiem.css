@@ -1,0 +1,29 @@
+﻿/* Bọc toàn bộ thanh tìm kiếm */
+.my-search-container {
+    display: flex; /* Dùng flexbox để căn chỉnh */
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden; /* Bo góc cho đẹp */
+}
+
+    /* Ô nhập liệu */
+    .my-search-container .my-search-box {
+        border: none; /* Bỏ viền mặc định */
+        padding: 10px;
+        font-size: 16px;
+        flex: 1; /* Cho ô text chiếm hết phần còn lại */
+    }
+
+    /* Nút bấm */
+    .my-search-container .my-search-button {
+        border: none; /* Bỏ viền mặc định */
+        background-color: #007bff; /* Màu xanh */
+        color: white;
+        padding: 10px 20px;
+        cursor: pointer; /* Biểu tượng bàn tay khi di chuột */
+    }
+
+        .my-search-container .my-search-button:hover {
+            background-color: #0056b3; /* Màu xanh đậm hơn khi hover */
+        }

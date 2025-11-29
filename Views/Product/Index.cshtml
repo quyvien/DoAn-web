@@ -1,0 +1,36 @@
+﻿@model IEnumerable<DoAn_web.Models.Product>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+<link href="~/Content/style_K/Style_SearchList.css" rel="stylesheet" />
+
+<div class="product-list-container">
+
+    <h2 class="list-title">Kết quả tìm kiếm cho "@ViewBag.CurrentFilter"</h2>
+
+    <div class="product-grid">
+
+        @if (!Model.Any())
+        {
+            <p style="text-align: center; width: 100%;">Không tìm thấy sản phẩm nào khớp với "@ViewBag.CurrentFilter".</p>
+        }
+        else
+        {
+
+            foreach (var product in Model)
+            {
+                <div class="product-grid-item">
+                    <a class="home-product-link" href="@Url.Action("Details", "Product", new { id = product.ProductID })">
+                        <div class="home-product-card">
+                            <img src="@Url.Content(product.ProductImage)" alt="@product.ProductName" class="home-product-image" />
+                            <h5 class="home-product-name">@product.ProductName</h5>
+                            <p class="home-product-price">@String.Format("{0:N0}", product.ProductPrice) đ</p>
+                        </div>
+                    </a>
+                </div>
+            }
+        }
+    </div>
+</div>

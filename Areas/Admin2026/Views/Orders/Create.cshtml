@@ -1,0 +1,133 @@
+﻿@model DoAn_web.Models.Order
+
+@{
+    // 1. Tiêu đề
+    ViewBag.Title = "Tạo đơn hàng mới";
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0">@ViewBag.Title</h5>
+    </div>
+
+    <div class="card-body">
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+            <div class="row mb-3">
+                @Html.LabelFor(model => model.CustomerID, "Khách hàng", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+                <div class="col-sm-10">
+                    @Html.DropDownList("CustomerID", null, "--- Chọn khách hàng ---", htmlAttributes: new { @class = "form-select" })
+                    @Html.ValidationMessageFor(model => model.CustomerID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                @Html.LabelFor(model => model.OrderDate, "Ngày đặt", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+                <div class="col-sm-10">
+                    @Html.EditorFor(model => model.OrderDate, new { htmlAttributes = new { @class = "form-control", type = "datetime-local" } })
+                    @Html.ValidationMessageFor(model => model.OrderDate, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                @Html.LabelFor(model => model.TotalAmount, "Tổng tiền", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+                <div class="col-sm-10">
+                    @Html.EditorFor(model => model.TotalAmount, new { htmlAttributes = new { @class = "form-control", type = "number", step = "1000" } })
+                    @Html.ValidationMessageFor(model => model.TotalAmount, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                @Html.LabelFor(model => model.PaymentStatus, "Trạng thái", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+                <div class="col-sm-10">
+                    @Html.DropDownListFor(model => model.PaymentStatus, new SelectList(
+                        new List<SelectListItem>
+                        {
+                            // Bạn có thể thêm/bớt các trạng thái ở đây
+                            new SelectListItem { Text = "Chờ xử lý", Value = "Chờ xử lý" },
+                            new SelectListItem { Text = "Đã thanh toán", Value = "Đã thanh toán" },
+                            new SelectListItem { Text = "Đã hủy", Value = "Đã hủy" }
+                        }, "Value", "Text"), "--- Chọn trạng thái ---", new { @class = "form-select" })
+
+                    @Html.ValidationMessageFor(model => model.PaymentStatus, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                @Html.LabelFor(model => model.AddressDelivery, "Địa chỉ giao", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+                <div class="col-sm-10">
+                    @Html.TextAreaFor(model => model.AddressDelivery, new { @class = "form-control", rows = 3 })
+                    @Html.ValidationMessageFor(model => model.AddressDelivery, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-10 offset-sm-2">
+                    <input type="submit" value="Tạo mới" class="btn btn-primary" />
+                    @Html.ActionLink("Quay về", "Index", null, new { @class = "btn btn-secondary ms-2" })
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+@* ... (Toàn bộ code form của bạn) ... *@
+
+
+@section Scripts {
+    <script>
+        // 1. Lấy dữ liệu địa chỉ (chuỗi JSON) từ Controller
+        //    và chuyển nó thành một đối tượng JavaScript
+        var customerAddresses = @Html.Raw(ViewBag.CustomerAddressesJson);
+
+        // 2. Tìm 2 ô quan trọng: Dropdown Khách hàng và Textarea Địa chỉ
+        var customerDropdown = document.getElementById("CustomerID");
+        var addressTextarea = document.getElementById("AddressDelivery");
+
+        // 3. Gắn một sự kiện "lắng nghe" khi bạn thay đổi Dropdown
+        customerDropdown.addEventListener("change", function() {
+
+            // 4. Lấy ID của khách hàng bạn vừa chọn
+            var selectedCustomerId = parseInt(this.value);
+
+            if (isNaN(selectedCustomerId)) {
+                // Nếu bạn chọn "--- Chọn khách hàng ---" (giá trị rỗng)
+                addressTextarea.value = ""; // Xóa rỗng ô địa chỉ
+                return;
+            }
+
+            // 5. Tìm địa chỉ của khách hàng đó trong dữ liệu
+            var customerData = customerAddresses.find(c => c.Id === selectedCustomerId);
+
+            // 6. TỰ ĐỘNG ĐIỀN ĐỊA CHỈ
+            if (customerData && customerData.Address) {
+                // Lựa chọn 1 (Lấy dữ liệu ban đầu)
+                addressTextarea.value = customerData.Address;
+            } else {
+                addressTextarea.value = ""; // Xóa rỗng nếu khách hàng không có địa chỉ
+            }
+        });
+    </script>
+}
+
+
+@*```
+
+    ---
+
+    ### 🔔 Nhắc nhở quan trọng
+
+    * **Controller (`OrdersController.cs`):** Hãy đảm bảo trong hàm `Create [GET]`, bạn đã cung cấp `ViewBag.CustomerID` (danh sách khách hàng) cho `DropDownList` "Khách hàng".
+        ```csharp
+        public ActionResult Create()
+        {
+            ViewBag.CustomerID = new SelectList(db.Customers, "CustomerID", "CustomerName");
+            return View();
+        }
+        ```*@

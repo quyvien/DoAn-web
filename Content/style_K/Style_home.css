@@ -1,0 +1,110 @@
+﻿.category-section {
+    width: 100%;
+    max-width: 1240px;
+    margin: 50px auto;
+}
+
+.category-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+
+/* ==================== GRID CHIA CỘT ==================== */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.col-md-3 {
+    width: 25%;
+    padding: 12px;
+}
+
+/* ==================== PRODUCT CARD ==================== */
+.home-product-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.home-product-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #e6e8ec;
+    padding: 16px;
+    transition: .25s;
+    height: 100%;
+    cursor: pointer;
+}
+
+    .home-product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 22px rgba(0, 0, 0, 0.12);
+    }
+
+/* IMAGE */
+.home-product-image {
+    width: 100%;
+    height: 230px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+/* NAME */
+.home-product-name {
+    font-size: 17px;
+    font-weight: 650;
+    height: 46px; /* giữ 2 dòng không làm lệch layout */
+    overflow: hidden;
+    margin-bottom: 4px;
+    text-align: center;
+}
+
+/* PRICE */
+.home-product-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #006aff;
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+
+.view-more-container {
+    text-align: center;
+    margin-top: 16px;
+}
+
+.view-more-btn {
+    padding: 7px 30px;
+    border: 1px solid #006aff;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #006aff;
+    text-decoration: none;
+    transition: .25s;
+}
+
+    .view-more-btn:hover {
+        background: #006aff;
+        color: #fff;
+    }
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 992px) {
+    .col-md-3 {
+        width: 50%;
+    }
+}
+
+@media (max-width: 576px) {
+    .col-md-3 {
+        width: 100%;
+    }
+
+    .home-product-image {
+        height: 200px;
+    }
+}

@@ -1,0 +1,448 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    width: 100%;
+}
+
+/* === PHẦN NAVBAR (Sửa lỗi co giãn) === */
+.navbar {
+    display: flex;
+    justify-content: space-between; /* Co giãn linh hoạt */
+    align-items: center;
+    background-color: #141924;
+    color: white;
+    padding: 10px 40px; /* Thêm padding 2 bên */
+    position: relative;
+    flex-wrap: nowrap;
+}
+
+/* --- NAV-LEFT --- */
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-shrink: 0;
+}
+
+    .nav-left .logo {
+        height: 50px;
+    }
+
+    .nav-left .apple-auth {
+        height: 35px;
+    }
+
+/* --- NAV-CENTER (Sửa lỗi co giãn) --- */
+/* =================================== */
+/* CSS cho Thanh Tìm Kiếm (Của bạn) */
+/* =================================== */
+
+.nav-center {
+flex-grow: 1; /* Cho phép co giãn */
+max-width: 600px; /* Giới hạn độ rộng */
+ display: flex;
+ justify-content: center;
+  min-width: 150px;
+ padding: 0 15px; /* Thêm đệm 2 bên */
+}
+
+.search-box {
+    
+    position: relative;
+display: flex;
+  align-items: center;
+    background-color: white;
+     border-radius: 25px;
+    padding: 8px 20px;
+    width: 100%;
+    max-width: 600px;
+}
+
+    .search-box i {
+         color: gray;
+         font-size: 18px;
+       margin-right: 10px;
+    }
+
+    .search-box input {
+        border: none;
+      outline: none;
+        width: 100%;
+         font-size: 15px;
+    }
+
+
+
+/* Hộp (div) rỗng chứa kết quả */
+#search-results {
+    display: none; /* 1. Mặc định ẩn */
+    position: absolute; /* 2. "Bay" (nổi) lên */
+    /* 3. Vị trí: Ngay dưới ô tìm kiếm (100%) */
+    top: 100%;
+    left: 0;
+    right: 0;
+    /* 4. Hình thức (Làm đẹp) */
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 0 0 8px 8px; /* Bo góc dưới */
+    z-index: 1000; /* Nổi lên trên mọi thứ khác */
+    max-height: 400px; /* Giới hạn chiều cao nếu kết quả quá dài */
+    overflow-y: auto; /* Tự động thêm thanh cuộn */
+}
+
+/* Từng dòng kết quả (thẻ <a>) */
+.search-result-item {
+    display: block; /* Hiển thị dạng khối (mỗi cái 1 dòng) */
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+    /* Hiệu ứng khi di chuột vào 1 dòng */
+    .search-result-item:hover {
+        background-color: #f5f5f5;
+    }
+
+    /* Bỏ viền của dòng cuối cùng */
+    .search-result-item:last-child {
+        border-bottom: none;
+    }
+
+/* --- NAV-RIGHT (Sửa cho HTML mới) --- */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 25px; /* Khoảng cách giữa các mục */
+    flex-shrink: 0;
+    white-space: nowrap;
+    justify-content: flex-end;
+}
+
+/* Đây là style cho cấu trúc mới (a bao bọc i và span) */
+.nav-item a {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Khoảng cách giữa icon và chữ */
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+    .nav-item a:hover {
+        text-decoration: none;
+        color:yellow;
+    }
+
+/* (Class .nav-item-text dùng để giấu chữ trên mobile) */
+
+
+.menu-toggle {
+    display: none;
+    font-size: 24px;
+    cursor: pointer;
+    /* Thêm padding để dễ bấm hơn */
+    padding: 5px;
+}
+
+/* === SUBNAV (Giữ nguyên) === */
+.subnav {
+    background-color: #141924;
+    border-top: 1px solid #5a5a5a;
+}
+
+    .subnav ul {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        margin: 0;
+        padding: 10px 0;
+        gap: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .subnav a {
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 15px;
+        padding: 5px 10px;
+    }
+
+        .subnav a:hover {
+            color: yellow;
+            border-bottom: 2px solid yellow;
+        }
+
+
+/* === FOOTER (Chung) === */
+.main-footer {
+    width: 100%;
+    background-color: #ffffff;
+}
+.footer-dark-area {
+    width: 100%;
+    background-color: #141924;
+    color: #fff;
+}
+
+.footer-info-section {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    margin: 60px auto;
+    max-width: 1300px;
+    padding: 0 20px;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+.footer-banner img {
+    display: block;
+    max-width: 1200px;
+    width: 80%;
+    margin: 0 auto 20px;
+}
+
+.info-card {
+    flex: 1 1 45%;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    min-width: 280px;
+}
+
+    .info-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .info-card h3 {
+        font-size: 1.5rem;
+        color: #111;
+        margin-bottom: 24px;
+    }
+
+    .info-card ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .info-card li {
+        margin-bottom: 14px;
+    }
+
+    .info-card a {
+        text-decoration: none;
+        color: #444;
+        font-size: 1.05rem;
+        transition: color 0.2s;
+    }
+
+        .info-card a:hover {
+            color: #0071e3;
+        }
+
+.footer-dark-area {
+    background-color: #131a22;
+    color: white;
+    padding: 40px 0 20px;
+}
+.footer-top,
+.footer-bottom {
+    max-width: 1200px; /* thu nhỏ nội dung lại */
+    margin: 0 auto; /* căn giữa */
+    padding: 0 20px; /* đệm 2 bên */
+}
+
+/* === FOOTER (Sửa lỗi co giãn) === */
+.footer-top {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 20px 10px;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    text-align: left;
+    background: transparent; /* QUAN TRỌNG: không đổ màu ở đây nữa */
+}
+/* ================================== */
+
+.footer-col {
+    color: white;
+    margin-bottom: 18px;
+    line-height: 1.5;
+    border-bottom: 1px solid #3a4553;
+    padding-bottom: 15px;
+    text-align: center;
+}
+
+.footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 20px 20px;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-line;
+    background: transparent; /* để lộ nền của .footer-dark-area */
+}
+
+/* === PHẦN RESPONSIVE (ĐÃ SỬA HOÀN CHỈNH) === */
+
+/* 1. MÁY TÍNH BẢNG (Tablet) - 992px trở xuống */
+@media (max-width: 992px) {
+    /* --- HEADER (2 hàng) --- */
+    .navbar {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px 20px;
+    }
+
+    .nav-left {
+        flex-grow: 1;
+    }
+
+    .nav-right {
+        flex-grow: 1;
+        justify-content: flex-end;
+        gap: 20px;
+    }
+    /* Giảm gap 1 chút */
+
+    /* SỬA: Giấu chữ, chừa icon (có thể bấm) */
+    .nav-item-text {
+        display: none;
+    }
+
+    .nav-item a {
+        gap: 0; /* Xóa khoảng cách khi chữ bị giấu */
+        font-size: 18px; /* Cho icon to hơn 1 chút */
+        padding: 5px; /* Tăng vùng bấm */
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    .nav-center {
+        order: 3;
+        width: 100%;
+        padding: 0;
+        min-width: unset;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    /* --- SUBNAV (Menu dọc) --- */
+    .subnav ul {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        background-color: #3a3a3a;
+        padding: 15px 0;
+    }
+
+    .subnav.active ul {
+        display: flex;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .subnav a {
+        font-size: 16px;
+        padding: 10px 0;
+    }
+
+    /* --- FOOTER & INFO --- */
+    .footer-dark-area {
+        padding: 30px 30px 15px;
+    }
+
+    .footer-info-section {
+        gap: 20px;
+    }
+
+    .info-card {
+        flex: 1 1 100%;
+        text-align: center;
+    }
+
+    /* SỬA: Footer 2 cột trên tablet */
+    .footer-top {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+/* 2. ĐIỆN THOẠI (Phone) - 768px trở xuống */
+@media (max-width: 768px) {
+    /* Header và Subnav đã được 992px xử lý */
+
+    /* --- FOOTER (1 cột) --- */
+    .footer-dark-area {
+        font-size: 12px;
+        padding: 20px 15px;
+    }
+
+    .footer-top {
+        grid-template-columns: 1fr; /* 1 cột trên điện thoại */
+    }
+
+    .footer-col {
+        border: none;
+    }
+
+    .info-card {
+        padding: 25px;
+        font-size: 14px;
+    }
+
+        .info-card h3 {
+            font-size: 1.3rem;
+        }
+    .category-section .row {
+        /* Đảm bảo các cột có thể xuống dòng đúng */
+        display: block;
+        overflow: hidden; /* tránh lỗi tràn float */
+    }
+
+    .category-section .col-md-3 {
+        width: 50%; /* 2 cột = 50% */
+        float: left; /* cho nó đứng cạnh nhau */
+        padding-left: 8px;
+        padding-right: 8px;
+        box-sizing: border-box;
+    }
+
+    /* Card bên trong tự full theo cột 50% */
+    .category-section .home-product-card {
+        width: 100%;
+    }
+}
+
+/* Hiệu ứng mở menu (Giữ nguyên) */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

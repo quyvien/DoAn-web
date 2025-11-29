@@ -1,0 +1,39 @@
+﻿
+@{
+    ViewBag.Title = "Đăng nhập";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+<link href="~/Content/style_K/Style_login.css" rel="stylesheet" />
+
+<div class="custom-form-container">
+    <h2>Đăng nhập</h2>
+    <hr />
+
+    @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        if (ViewBag.LoginError != null)
+        {
+            <div class="error-message">@ViewBag.LoginError</div>
+        }
+
+        <div class="form-row">
+            <label class="custom-label">Username</label>
+            <input type="text" name="Username" class="custom-input" required />
+        </div>
+
+        <div class="form-row">
+            <label class="custom-label">Mật khẩu</label>
+            <input type="password" name="Password" class="custom-input" required />
+        </div>
+
+        <div class="form-row">
+            <input type="submit" value="Đăng nhập" class="custom-button button-success" />
+        </div>
+
+        <p style="margin-top: 20px;">
+            Chưa có tài khoản? @Html.ActionLink("Đăng ký ngay", "Register")
+        </p>
+    }
+</div>

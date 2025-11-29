@@ -1,0 +1,65 @@
+﻿
+@{
+    ViewBag.Title = "TrangCamera";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+<link href="~/Content/style_K/Style_TrangCon.css" rel="stylesheet" />
+<link href="~/Content/style_K/Style_silder.css" rel="stylesheet" />
+@*   breadcrumb     *@
+
+@*banner*@
+
+<section class="banner-section">
+    <div class="slider">
+        <div class="slides">
+            <div class="slide" onclick="window.location.href=''">
+                <img src="~/Content/img/danh mục-camera_Danh mục copy 2.png">
+            </div>
+            <div class="slide" onclick="window.location.href=''">
+                <img src="~/Content/img/danh mục-camera_Danh mục.png">
+            </div>
+            <div class="slide" onclick="window.location.href=''">
+                <img src="~/Content/img/DM.jpg">
+            </div>
+
+        </div>
+
+        @*Nút điều hướng*@
+        <button class="prev">&#10094;</button>
+        <button class="next">&#10095;</button>
+
+        @*Dấu chấm*@
+        <div class="dots"></div>
+    </div>
+</section>
+<script src="~/Content/js/js_banner.js"></script>
+@* Best seller*@
+
+<div class="product-list-container">
+
+    <h2 class="list-title">Tất cả sản phẩm Camera</h2>
+
+    @* Dùng class .product-grid thay cho .row *@
+    <div class="product-grid">
+
+        @* Lặp qua Model *@
+        @foreach (var product in Model)
+        {
+            @*  *@
+            <div class="product-grid-item">
+                <a class="home-product-link" href="@Url.Action("Details", "Product", new { id = product.ProductID })">
+                    <div class="home-product-card">
+
+                        <img src="@Url.Content(product.ProductImage)" alt="@product.ProductName" class="home-product-image" />
+
+                        <h5 class="home-product-name">@product.ProductName</h5>
+
+                        <p class="home-product-price">@String.Format("{0:N0}", product.ProductPrice) đ</p>
+
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>

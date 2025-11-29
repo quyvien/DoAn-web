@@ -1,0 +1,143 @@
+﻿@model IEnumerable<DoAn_web.Models.User>
+
+@{
+    ViewBag.Title = "Quản lý Tài khoản";
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@* --- CSS TRANG TRÍ (Soft UI) --- *@
+<style>
+    .btn-action {
+        padding: 6px 12px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        border: none;
+        margin: 0 2px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+    /* Màu nút Sửa */
+    .btn-soft-warning {
+        background-color: #fff3e0;
+        color: #f57c00;
+    }
+
+        .btn-soft-warning:hover {
+            background-color: #f57c00;
+            color: #fff;
+        }
+
+    /* Màu nút Xóa */
+    .btn-soft-danger {
+        background-color: #ffebee;
+        color: #d32f2f;
+    }
+
+        .btn-soft-danger:hover {
+            background-color: #d32f2f;
+            color: #fff;
+        }
+
+    /* Badge phân quyền */
+    .badge-role {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
+
+    .role-admin {
+        background-color: #ffebee;
+        color: #d32f2f;
+        border: 1px solid #ffcdd2;
+    }
+    /* Đỏ nhạt */
+    .role-customer {
+        background-color: #e3f2fd;
+        color: #1976d2;
+        border: 1px solid #bbdefb;
+    }
+    /* Xanh nhạt */
+</style>
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-primary fw-bold mb-0"><i class="fas fa-user-shield me-2"></i>Quản lý Tài khoản (Users)</h3>
+
+        <a href="@Url.Action("Create")" class="btn btn-primary fw-bold shadow-sm">
+            <i class="fas fa-plus me-2"></i>Thêm Quản trị viên
+        </a>
+    </div>
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger shadow-sm border-0 border-start border-5 border-danger fade show mb-4">
+            <i class="fas fa-exclamation-triangle me-2"></i>@TempData["Error"]
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success border-0 shadow-sm border-start border-5 border-success mb-4">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+        </div>
+    }
+
+    <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-secondary text-uppercase small fw-bold">
+                    <tr>
+                        <th class="ps-4">Tên đăng nhập (Username)</th>
+                        <th>Mật khẩu</th>
+                        <th class="text-center">Vai trò (Role)</th>
+                        <th class="text-center">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-bold text-dark">
+                                <i class="fas fa-user me-2 text-secondary"></i>@item.Username
+                            </td>
+                            <td class="text-muted font-monospace">
+                                ••••••••
+                            </td>
+                            <td class="text-center">
+                                @if (item.UserRole != null && item.UserRole.Trim() == "A") // Admin
+                                {
+                                    <span class="badge badge-role role-admin"><i class="fas fa-crown me-1"></i>Admin</span>
+                                }
+                                else // Customer hoặc Khác
+                                {
+                                    <span class="badge badge-role role-customer"><i class="fas fa-user-tag me-1"></i>Khách hàng</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <a href="@Url.Action("Edit", new { username = item.Username })" class="btn-action btn-soft-warning">
+                                    <i class="fas fa-key me-1"></i> Đổi MK/Quyền
+                                </a>
+
+                                @if (item.UserRole.Trim() != "A") // Chỉ cho xóa Khách, hạn chế xóa Admin tại đây cho an toàn
+                                {
+                                    <a href="@Url.Action("Delete", new { username = item.Username })" class="btn-action btn-soft-danger">
+                                        <i class="fas fa-trash-alt me-1"></i> Xóa
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

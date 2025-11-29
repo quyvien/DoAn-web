@@ -1,0 +1,156 @@
+﻿@* File: /Views/Cart/Checkout.cshtml *@
+
+@{
+    ViewBag.Title = "Xác nhận Thanh toán";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+
+    // 1. Lấy dữ liệu từ ViewBag
+    var cart = ViewBag.Cart as List<DoAn_web.Models.CartItem>;
+    var customer = ViewBag.Customer as DoAn_web.Models.Customer;
+
+    // 2. Tính toán các con số
+    decimal subtotal = cart.Sum(item => item.TotalPrice); // Tạm tính (chưa giảm)
+    decimal discountAmount = (decimal)(ViewBag.DiscountAmount ?? 0); // Tiền giảm
+
+    // Nếu Controller đã tính FinalTotal thì lấy, nếu chưa (lần đầu vào) thì bằng subtotal
+    decimal finalTotal = (decimal)(ViewBag.FinalTotal ?? 0);
+    if (finalTotal == 0 && discountAmount == 0)
+    {
+        finalTotal = subtotal;
+    }
+}
+
+<link href="~/Content/style_K/Style_Checkout.css" rel="stylesheet" />
+
+<div class="checkout-container">
+    <h2>Xác nhận Đơn hàng</h2>
+
+    @* HIỂN THỊ THÔNG BÁO LỖI/THÀNH CÔNG KHI NHẬP MÃ *@
+    @if (TempData["Error"] != null)
+    {
+        <div style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+            @TempData["Error"]
+        </div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div style="background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+            @TempData["Success"]
+        </div>
+    }
+
+    <hr />
+    <div class="checkout-row">
+
+        @* --- CỘT BÊN TRÁI (TÓM TẮT ĐƠN HÀNG & MÃ GIẢM GIÁ) --- *@
+        <div class="checkout-col-summary">
+            <h4>Sản phẩm trong giỏ:</h4>
+
+            @foreach (var item in cart)
+            {
+                <div class="checkout-item">
+                    <img src="@Url.Content(item.ProductImage)" height="100px" width="100px" />
+                    <span>@item.ProductName (x @item.Quantity)</span>
+                    <strong>@String.Format("{0:N0}", item.TotalPrice) đ</strong>
+                </div>
+            }
+
+            @* === PHẦN MÃ GIẢM GIÁ (Mới thêm) === *@
+            <div style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                <label style="font-weight:bold;">Mã giảm giá:</label>
+                @using (Html.BeginForm("ApplyCoupon", "Cart", FormMethod.Post))
+                {
+                    <div style="display:flex; gap: 10px;">
+                        <input type="text" name="couponCode" class="custom-input" placeholder="Nhập mã giảm giá ..." style="flex: 1;" />
+                        <button type="submit" class="custom-button" style="padding: 5px 15px; width: auto; background-color:brown ;color:white;">Áp dụng</button>
+                    </div>
+                }
+            </div>
+
+            @* === PHẦN TỔNG TIỀN CHI TIẾT (Sửa đổi) === *@
+            <div class="checkout-total" style="margin-top: 20px; border-top: 2px solid #000; padding-top: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Tạm tính:</span>
+                    <span>@String.Format("{0:N0}", subtotal) đ</span>
+                </div>
+
+                @if (discountAmount > 0)
+                {
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: green;">
+                        <span>Giảm giá :</span>
+                        <span>- @String.Format("{0:N0}", discountAmount) đ</span>
+                    </div>
+                }
+
+                <div style="display: flex; justify-content: space-between; font-size: 1.2em; font-weight: bold; margin-top: 10px;">
+                    <span>Tổng thanh toán:</span>
+                    <span style="color: red;">@String.Format("{0:N0}", finalTotal) đ</span>
+                </div>
+            </div>
+        </div>
+
+        @* --- CỘT BÊN PHẢI (THÔNG TIN GIAO HÀNG & FORM ĐẶT HÀNG) --- *@
+        <div class="checkout-col-address">
+            <h4>Thông tin giao hàng:</h4>
+
+            @* Hiển thị thông tin Customer *@
+            <p><strong>Khách hàng:</strong> @customer.CustomerName</p>
+            <p><strong>Điện thoại:</strong> @customer.CustomerPhone</p>
+            <p><strong>Email:</strong> @customer.CustomerEmail</p>
+
+            <hr />
+
+            @* Form này sẽ gửi đến Action "PlaceOrder" *@
+            @using (Html.BeginForm("PlaceOrder", "Cart", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                @* 1. Ô ĐỊA CHỈ GIAO HÀNG *@
+                <div class="form-row">
+                    <label class="custom-label">Địa chỉ giao hàng:</label>
+                    <input type="text" name="AddressDelivery" class="custom-input" value="@customer.CustomerAddress" required />
+                </div>
+
+                @* 2. LỰA CHỌN PHƯƠNG THỨC THANH TOÁN *@
+                <hr />
+                <h4>Phương thức thanh toán:</h4>
+                <div class="form-row">
+                    <div class="payment-options">
+
+                        <input type="radio" name="PaymentMethod" value="Tiền mặt (COD)" id="pay_cod" checked required />
+                        <label for="pay_cod" style="font-weight: normal; margin-right: 15px;">Thanh toán khi nhận hàng (COD)</label>
+
+                        <br />
+
+                        <input type="radio" name="PaymentMethod" value="Chuyển khoản" id="pay_bank" required />
+                        <label for="pay_bank" style="font-weight: normal;">Chuyển khoản ngân hàng</label>
+                    </div>
+                </div>
+                <div id="qrBox" style="display:none; margin-top:15px;">
+                    <h4>Quét mã để thanh toán:</h4>
+                    <img class="qr-chuyen-khoan" src="@Url.Content("~/Content/img/QR-chuyen-khoan.jpg")" style="max-width: 200px;" />
+                </div>
+
+                <hr />
+
+                @* Gửi tổng số tiền đi (QUAN TRỌNG: Gửi finalTotal thay vì totalAmount) *@
+                <input type="hidden" name="TotalAmount" value="@finalTotal" />
+
+                <div class="form-row" style="margin-top: 20px;">
+                    <button type="submit" class="custom-button button-success" style="width: 100%;">
+                        XÁC NHẬN ĐẶT HÀNG
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll("input[name='PaymentMethod']").forEach(function (r) {
+        r.addEventListener("change", function () {
+            document.getElementById("qrBox").style.display =
+                r.value === "Chuyển khoản" ? "block" : "none";
+        });
+    });
+</script>

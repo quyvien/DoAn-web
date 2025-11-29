@@ -1,0 +1,156 @@
+﻿@model IEnumerable<DoAn_web.Models.Customer>
+
+@{
+    ViewBag.Title = "Quản lý Khách hàng";
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@* --- PHẦN CSS TRANG TRÍ NÚT (Đã sửa đổi để hiện chữ) --- *@
+<style>
+    /* Nút hành động chung */
+    .btn-action {
+        /* Không cố định width/height nữa để nút tự giãn theo chữ */
+        padding: 6px 12px;
+        border-radius: 6px; /* Bo góc nhẹ nhàng */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        border: none;
+        margin: 0 2px; /* Khoảng cách giữa các nút */
+        text-decoration: none;
+        font-weight: 600; /* Chữ đậm cho dễ đọc */
+        font-size: 0.85rem; /* Kích thước chữ vừa phải */
+    }
+
+        /* Hiệu ứng khi rê chuột: Nổi lên nhẹ */
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+    /* Màu cho nút Chi tiết (Xanh dương nhạt) */
+    .btn-soft-info {
+        background-color: #e3f2fd;
+        color: #1976d2;
+    }
+
+        .btn-soft-info:hover {
+            background-color: #1976d2;
+            color: #fff;
+        }
+
+    /* Màu cho nút Sửa (Vàng cam nhạt) */
+    .btn-soft-warning {
+        background-color: #fff3e0;
+        color: #f57c00;
+    }
+
+        .btn-soft-warning:hover {
+            background-color: #f57c00;
+            color: #fff;
+        }
+
+    /* Màu cho nút Xóa (Đỏ nhạt) */
+    .btn-soft-danger {
+        background-color: #ffebee;
+        color: #d32f2f;
+    }
+
+        .btn-soft-danger:hover {
+            background-color: #d32f2f;
+            color: #fff;
+        }
+
+    /* Làm đẹp bảng */
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-primary fw-bold mb-0">
+            <i class="fas fa-users me-2"></i>Danh sách Khách hàng
+        </h3>
+
+        @using (Html.BeginForm("Index", "Customers", FormMethod.Get, new { @class = "d-flex shadow-sm rounded overflow-hidden" }))
+        {
+            <input type="text" name="searchString" value="@ViewBag.CurrentFilter" class="form-control border-0 ps-3" placeholder="Tìm tên, SĐT, email..." style="width: 250px;">
+            <button type="submit" class="btn btn-primary px-3 rounded-0"><i class="fas fa-search"></i></button>
+        }
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger shadow-sm border-0 border-start border-5 border-danger fade show">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+        </div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success shadow-sm border-0 border-start border-5 border-success fade show">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+        </div>
+    }
+
+    <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-secondary text-uppercase small fw-bold">
+                    <tr>
+                        <th class="ps-4">Họ và Tên</th>
+                        <th>Số điện thoại</th>
+                        <th>Email</th>
+                        <th>Địa chỉ</th>
+                        <th class="text-center" style="min-width: 250px;">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark">@item.CustomerName</div>
+                                    <small class="text-muted">ID: #@item.CustomerID</small>
+                                </td>
+                                <td><span class="badge bg-light text-dark border">@item.CustomerPhone</span></td>
+                                <td>@item.CustomerEmail</td>
+                                <td class="text-truncate" style="max-width: 200px;" title="@item.CustomerAddress">
+                                    @item.CustomerAddress
+                                </td>
+                                <td class="text-center text-nowrap">
+                                    <a href="@Url.Action("Details", new { id = item.CustomerID })"
+                                       class="btn-action btn-soft-info">
+                                        <i class="fas fa-eye me-1"></i> Chi tiết
+                                    </a>
+
+                                    <a href="@Url.Action("Edit", new { id = item.CustomerID })"
+                                       class="btn-action btn-soft-warning">
+                                        <i class="fas fa-pen me-1"></i> Sửa
+                                    </a>
+
+                                    <a href="@Url.Action("Delete", new { id = item.CustomerID })"
+                                       class="btn-action btn-soft-danger">
+                                        <i class="fas fa-trash-alt me-1"></i> Xóa
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                <i class="fas fa-box-open fa-2x mb-2 d-block"></i>
+                                Không tìm thấy khách hàng nào.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

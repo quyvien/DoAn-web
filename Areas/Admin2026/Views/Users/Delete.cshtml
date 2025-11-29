@@ -1,0 +1,78 @@
+﻿@model DoAn_web.Models.User
+
+@{
+    ViewBag.Title = "Xóa Tài khoản";
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-danger text-white fw-bold text-center py-3">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>XÁC NHẬN XÓA TÀI KHOẢN</h5>
+                </div>
+
+                <div class="card-body p-4 text-center">
+                    <div class="mb-4 text-danger opacity-75">
+                        <i class="fas fa-user-times fa-5x"></i>
+                    </div>
+
+                    <h4 class="fw-bold text-dark">Bạn có chắc chắn muốn xóa?</h4>
+                    <p class="text-muted mb-4">
+                        Tài khoản <strong>@Model.Username</strong> sẽ bị xóa vĩnh viễn khỏi hệ thống.<br>
+                        <span class="text-danger fw-bold">Hành động này không thể khôi phục lại!</span>
+                    </p>
+
+                    <div class="alert alert-light border text-start d-inline-block w-100 shadow-sm rounded-3">
+                        <div class="row">
+                            <div class="col-4 text-muted fw-bold text-end">Username:</div>
+                            <div class="col-8 fw-bold text-primary">@Model.Username</div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-4 text-muted fw-bold text-end">Vai trò:</div>
+                            <div class="col-8">
+                                @if (Model.UserRole != null && Model.UserRole.Trim() == "A")
+                                {
+                                    <span class="badge bg-danger">Quản trị viên (Admin)</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info text-dark">Khách hàng</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    @using (Html.BeginForm())
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="d-flex justify-content-center gap-2 mt-4">
+                            <a href="@Url.Action("Index")" class="btn btn-secondary px-4 fw-bold">
+                                <i class="fas fa-times me-2"></i>Hủy bỏ
+                            </a>
+
+                            <button type="submit" class="btn btn-danger px-4 fw-bold shadow-sm">
+                                <i class="fas fa-trash-alt me-2"></i>Xác nhận Xóa
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger shadow-sm border-0 border-start border-5 border-danger fade show mb-3">
+        <i class="fas fa-exclamation-triangle me-2"></i>@TempData["Error"]
+    </div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success shadow-sm border-0 border-start border-5 border-success fade show mb-3">
+        <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+    </div>
+}

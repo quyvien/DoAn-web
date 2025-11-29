@@ -1,0 +1,75 @@
+﻿@model IEnumerable<DoAn_web.Models.ProductDetail>
+
+@{
+    ViewBag.Title = "Cấu hình: " + ViewBag.CurrentProductName;
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-white">Cấu hình kỹ thuật: @ViewBag.CurrentProductName</h5>
+        <a href="@Url.Action("Index", "Products")" class="btn btn-sm btn-light text-primary fw-bold">Quay lại danh sách SP</a>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 border-end">
+                <h6 class="fw-bold text-success mb-3">Thêm thông số mới</h6>
+                <form action="@Url.Action("Create")" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="ProductID" value="@ViewBag.CurrentProductID" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên thông số</label>
+                        <input type="text" name="SpecName" class="form-control" placeholder="VD: Màn hình, Chip..." required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Giá trị</label>
+                        <textarea name="SpecValue" class="form-control" rows="2" placeholder="VD: OLED 6.7 inch..." required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Thứ tự (Số lớn hiện sau)</label>
+                        <input type="number" name="OrderIndex" class="form-control" value="1" />
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fa fa-plus"></i> Thêm vào
+                    </button>
+                </form>
+            </div>
+
+            <div class="col-md-8">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:30%">Tên thông số</th>
+                            <th>Giá trị</th>
+                            <th> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@item.SpecName</td>
+                                    <td>@item.SpecValue</td>
+                                    <td class="text-center">
+                                        <a href="@Url.Action("Delete", new { id = item.DetailID })" class="btn btn-sm btn-danger" onclick="return confirm('Xóa dòng này?');">Xoá</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="3" class="text-center text-muted">Chưa có thông số nào.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

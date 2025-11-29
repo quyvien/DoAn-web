@@ -1,0 +1,76 @@
+﻿@model DoAn_web.Models.Order
+
+@{
+    ViewBag.Title = "Chi tiết Đơn hàng"; // 1. Tiêu đề rõ ràng
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+        <h5 class="mb-0">@ViewBag.Title (ID: @Model.OrderID)</h5>
+    </div>
+
+    <div class="card-body">
+
+        <dl class="row">
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.Customer.CustomerName)
+            </dt>
+            <dd class="col-sm-9">
+                <p class="form-control-plaintext">@Html.DisplayFor(model => model.Customer.CustomerName)</p>
+            </dd>
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.OrderDate)
+            </dt>
+            <dd class="col-sm-9">
+                <p class="form-control-plaintext">@Model.OrderDate.ToString("dd/MM/yyyy")</p>
+            </dd>
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.TotalAmount)
+            </dt>
+            <dd class="col-sm-9">
+                <p class="form-control-plaintext">@Model.TotalAmount.ToString("N0")đ</p>
+            </dd>
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.PaymentStatus)
+            </dt>
+            <dd class="col-sm-9">
+                <p class="form-control-plaintext">
+                    @if (Model.PaymentStatus == "Đã thanh toán")
+                    {
+                        <span class="badge bg-success">@Model.PaymentStatus</span>
+                    }
+                    else if (Model.PaymentStatus == "Chờ xử lý")
+                    {
+                        <span class="badge bg-warning text-dark">@Model.PaymentStatus</span>
+                    }
+                    else if (Model.PaymentStatus == "Đã hủy")
+                    {
+                        <span class="badge bg-danger">@Model.PaymentStatus</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">@Model.PaymentStatus</span>
+                    }
+                </p>
+            </dd>
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.AddressDelivery)
+            </dt>
+            <dd class="col-sm-9">
+                <p class="form-control-plaintext">@Html.DisplayFor(model => model.AddressDelivery)</p>
+            </dd>
+
+        </dl>
+
+    </div> <div class="card-footer bg-light">
+        @Html.ActionLink("Sửa", "Edit", new { id = Model.OrderID }, new { @class = "btn btn-warning" })
+        @Html.ActionLink("Quay về", "Index", null, new { @class = "btn btn-secondary ms-2" })
+    </div>
+</div>

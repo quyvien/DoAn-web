@@ -1,0 +1,51 @@
+﻿@model DoAn_web.Models.Customer
+
+@{
+    ViewBag.Title = "Xóa khách hàng";
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa dữ liệu
+                    </h5>
+                </div>
+                <div class="card-body text-center p-4">
+                    <div class="text-danger mb-3">
+                        <i class="fas fa-trash-alt fa-4x"></i>
+                    </div>
+
+                    <h4 class="card-title fw-bold text-dark">Bạn có chắc chắn muốn xóa?</h4>
+                    <p class="card-text text-muted mb-4">
+                        Hành động này sẽ xóa vĩnh viễn khách hàng <strong>@Model.CustomerName</strong> và tài khoản đăng nhập <strong>@Model.Username</strong> khỏi hệ thống. <br />
+                        <span class="text-danger fw-bold">Hành động này không thể hoàn tác!</span>
+                    </p>
+
+                    <div class="alert alert-light border text-start d-inline-block w-100">
+                        <p class="mb-1"><strong>Họ tên:</strong> @Model.CustomerName</p>
+                        <p class="mb-1"><strong>SĐT:</strong> @Model.CustomerPhone</p>
+                        <p class="mb-0"><strong>Email:</strong> @Model.CustomerEmail</p>
+                    </div>
+
+                    @using (Html.BeginForm())
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="mt-4 d-flex justify-content-center gap-2">
+                            <a href="@Url.Action("Index")" class="btn btn-secondary px-4">
+                                <i class="fas fa-times me-2"></i>Hủy bỏ
+                            </a>
+                            <button type="submit" class="btn btn-danger px-4 fw-bold">
+                                <i class="fas fa-check me-2"></i>Xác nhận Xóa
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

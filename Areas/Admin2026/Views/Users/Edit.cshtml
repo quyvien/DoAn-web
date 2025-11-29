@@ -1,0 +1,48 @@
+﻿@model DoAn_web.Models.User
+
+@{
+    ViewBag.Title = "Cập nhật tài khoản";
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+
+    var roleList = new List<SelectListItem> {
+        new SelectListItem { Text = "Quản trị viên (Admin)", Value = "A" },
+        new SelectListItem { Text = "Khách hàng (Customer)", Value = "C" }
+    };
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-md-6">
+        <div class="card shadow border-0">
+            <div class="card-header bg-warning text-dark fw-bold">
+                <i class="fas fa-key me-2"></i>Cập nhật Tài khoản
+            </div>
+            <div class="card-body p-4">
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">TÊN ĐĂNG NHẬP (KHÔNG THỂ ĐỔI)</label>
+                        @Html.EditorFor(model => model.Username, new { htmlAttributes = new { @class = "form-control bg-light", @readonly = "readonly" } })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mật khẩu mới</label>
+                        @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                        <small class="text-muted fst-italic">Nhập mật khẩu mới để thay đổi.</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Phân quyền</label>
+                        @Html.DropDownListFor(model => model.UserRole, roleList, new { @class = "form-select" })
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning fw-bold">Lưu Thay Đổi</button>
+                        <a href="@Url.Action("Index")" class="btn btn-light">Quay lại</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

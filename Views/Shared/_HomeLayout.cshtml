@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/style_K/Style_Layout.css" rel="stylesheet" />
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-left">
+            <a href="/Default/Index"><i class="fab fa-app-store fa-lg" style=" font-size:65px; padding-top:10px;padding-bottom:10px; color:white"></i></a>
+        </div>
+
+        <div class="nav-center">
+            <div class="search-box" style="position:relative">
+                @using (Html.BeginForm("Index", "Product", FormMethod.Get))
+                {
+                    <div style="display:flex; width:100%; align-items:center;">
+                        <i class="fas fa-search"></i>
+                        @Html.TextBox("searchString", null, new
+                   {
+                       @id = "live-search-box",
+                       @placeholder = "Bạn tìm gì...",
+                       @style = "border:none; outline:none; flex-grow:1; margin-left: 10px;",
+                       autocomplete = "off",
+                        data_url = @Url.Action("LiveSearch", "Product")
+                   })
+                        <input type="submit" value="" style="display:none;" />
+                    </div>
+                }
+                <div id="search-results">
+                    @*   hoi js se do het html vao day  *@
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+        
+
+        <div class="nav-right">
+
+            @* kiem tra coi dang nhap chua *@
+            @if (User.Identity.IsAuthenticated)
+            {
+                @* da dang nhap *@
+
+                @* hien chuoi chao mung *@
+                <div class="nav-item">
+                    <span class="nav-item-text" style="color: white; padding-right: 15px;">Chào, @User.Identity.Name!</span>
+                </div>
+
+                @* 🔥 SỬA Ở ĐÂY: Thêm dấu @ *@
+                if (User.IsInRole("A"))
+                {
+                    @* neu la Admin  *@
+                    <div class="nav-item">
+
+                        <a href="@Url.Action("Index", "Home", new { area = "Admin2026" })">
+                            <i class="fas fa-cog"></i>
+                            <span class="nav-item-text">Quản Trị</span>
+                        </a>
+                    </div>
+                }
+                @* 🔥 SỬA Ở ĐÂY: Thêm dấu @ *@
+                else if (User.IsInRole("C"))
+                {
+                    @* Nchi toi lich su mua hang *@
+                    <div class="nav-item">
+
+                        <a href="@Url.Action("OrderHistory", "Default")">
+                            <i class="fas fa-history"></i>
+                            <span class="nav-item-text">Lịch Sử Đơn Hàng</span>
+                        </a>
+                    </div>
+                }
+
+
+                <div class="nav-item">
+                    <a href="@Url.Action("Index", "Cart")">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="nav-item-text">Giỏ hàng</span>
+                    </a>
+                </div>
+
+
+                <div class="nav-item">
+                    <a href="@Url.Action("Logout", "Account")">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="nav-item-text">Đăng xuất</span>
+                    </a>
+                </div>
+            }
+            else
+            {
+
+                @* Link Giỏ hàng (Code này của bạn đã đúng) *@
+                <div class="nav-item">
+                    <a href="@Url.Action("Index", "Cart")">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="nav-item-text">Giỏ hàng</span>
+                    </a>
+                </div>
+
+                @* hien thi link dang nhap *@
+                <div class="nav-item">
+                    <a href="@Url.Action("Login", "Account")">
+                        <i class="far fa-user"></i>
+                        <span class="nav-item-text">Tài khoản</span>
+                    </a>
+                </div>
+            }
+
+            @* Nút Menu Toggle (Giữ nguyên) *@
+            <div class="menu-toggle" id="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+
+        </div>
+    </header>
+
+    <nav class="subnav" id="subnav">
+        <ul>
+            <li><a href="/Default/TrangIphone">iPhone</a></li>
+            <li><a href="/Default/TrangIpad">iPad</a></li>
+            <li><a href="/Default/TrangMac">Mac</a></li>
+            <li><a href="/Default/TrangWatch">Watch</a></li>
+            <li><a href="/Default/PhuKien">Phụ kiện</a></li>
+            <li><a href="/Default/AmThanh">Âm thanh</a></li>
+            <li><a href="/Default/Camera">Camera</a></li>
+            <li><a href="/Default/GiaDung">Gia dụng</a></li>
+            <li><a href="/Default/MayLuot">Máy lướt</a></li>
+            <li><a href="/Default/TinTuc">Tin tức</a></li>
+            <li><a href="/Default/DichVu">Dịch vụ</a></li>
+        </ul>
+    </nav>
+
+    <script>
+        document.getElementById("menu-toggle").addEventListener("click", function () {
+            document.getElementById("subnav").classList.toggle("active");
+        });
+    </script>
+
+    <div>
+        @RenderBody()
+    </div>
+
+    <footer class="main-footer">
+
+        <div class="footer-info-section">
+            <div class="info-card">
+                <h3>Chăm sóc khách hàng</h3>
+                <ul>
+                    <li><a href="#">Hotline: 23232 23232</a></li>
+                    <li><a href="#">Email:mkla1252006@gmail.com</a></li>
+                    <li><a href="#">Chính sách đổi trả</a></li>
+                    <li><a href="#">Hướng dẫn mua hàng</a></li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <h3>Thông tin</h3>
+                <ul>
+                    <li><a href="#">Giới thiệu</a></li>
+                    <li><a href="#">Tuyển dụng</a></li>
+                    <li><a href="#">Tin tức</a></li>
+                    <li><a href="#">Liên hệ</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-banner">
+            <a href="#"><img src="~/Content/img/2.jpeg" /></a>
+        </div>
+        <div class="footer-dark-area">
+            <div class="footer-top">
+                <div class="footer-col">
+                    <i class="fab fa-app-store fa-lg" style=" font-size:65px; padding-top:25px;padding-bottom:10px"></i>
+                    <p>Năm 2020, Shop trở thành đại lý ủy quyền của Apple. Chúng tôi phát triển chuỗi cửa hàng tiêu chuẩn và Apple Mono Store nhằm mang đến trải nghiệm tốt nhất về sản phẩm và dịch vụ của Apple cho người dùng Việt Nam</p>
+                </div>
+                <div class="footer-col">
+                    <p>Information</p>
+                    <p>New Feed</p>
+                    <p>Check IMEI</p>
+                    <P>Phuong thuc thanh toan</P>
+                    <p>Thue diem ban le</p>
+                    <p>Tuyen Dung</p>
+                </div>
+                <div class="footer-col">
+                    <p>Information</p>
+                    <p>New Feed</p>
+                    <p>Check IMEI</p>
+                    <P>Phuong thuc thanh toan</P>
+                    <p>Thue diem ban le</p>
+                    <p>Tuyen Dung</p>
+                </div>
+                <div class="footer-col">
+                    <p>Information</p>
+                    <p>New Feed</p>
+                    <p>Check IMEI</p>
+                    <P>Phuong thuc thanh toan</P>
+                    <p>Thue diem ban le</p>
+                    <p>Tuyen Dung</p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>
+                    © 2016 Công ty Cổ Phần Awtich Việt Nam GPDKKD: 0824279756 do Sở KH & ĐT cali cấp ngày 08/06/2052.
+                    Địa chỉ: 407/30,Su Van Hang,P12,Q10,TPHCM
+                    Đại diện pháp luật: Awtich | ĐT: 0299.999.9999 | Email: lienhe@shopAwtich.com
+                </p>
+            </div>
+        </div>
+
+    </footer>
+   
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script> @* Đảm bảo bạn đã có jQuery *@
+    <script src="~/Content/js/js_Search.js"></script>
+   
+
+</body>
+</html>

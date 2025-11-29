@@ -1,0 +1,18 @@
+﻿@using (Html.BeginForm(null, null, FormMethod.Get))
+{
+    @* Gói tất cả trong class "input-group" *@
+    <div class="input-group">
+
+        @* Đây là ô text *@
+        @Html.TextBox("searchString", ViewBag.CurrentFilter as string, new
+        {
+            @class = "form-control",
+            @placeholder = "Tìm kiếm sản phẩm..."
+        })
+
+        @* Gói nút bấm trong "input-group-append" (hoặc "input-group-btn" cho Bootstrap 3) *@
+        <div class="input-group-append">
+            <input type="submit" value="Tìm" class="btn btn-primary" />
+        </div>
+    </div>
+}

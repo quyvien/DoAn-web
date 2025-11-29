@@ -1,0 +1,61 @@
+﻿@model DoAn_web.Models.Category
+
+@{
+    ViewBag.Title = "Chỉnh sửa Danh mục"; // 1. Tiêu đề rõ ràng
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+        <h5 class="mb-0">@ViewBag.Title: @Html.DisplayFor(model => model.CategoryName)</h5>
+    </div>
+
+    <div class="card-body">
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+            @Html.HiddenFor(model => model.CategoryID)
+
+            <div class="row mb-3">
+
+                @Html.LabelFor(model => model.CategoryName, "Tên danh mục", htmlAttributes: new { @class = "col-sm-2 col-form-label fw-bold" })
+
+                <div class="col-sm-10">
+                    @Html.EditorFor(model => model.CategoryName, new { htmlAttributes = new { @class = "form-control" } })
+
+                    @Html.ValidationMessageFor(model => model.CategoryName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-10 offset-sm-2">
+                    <input type="submit" value="Lưu thay đổi" class="btn btn-primary" />
+
+                    @Html.ActionLink("Quay về", "Index", null, new { @class = "btn btn-secondary ms-2" })
+                </div>
+            </div>
+        }
+
+    </div>
+</div> 
+
+
+@*### 🎨 Giải thích các thay đổi
+
+* **Xóa `<h2>
+    `, `<h4>
+        `:** Các thẻ tiêu đề cũ được thay thế bằng `ViewBag.Title` và một `card-header` thống nhất.
+        * **`card-header`:** Tôi đã thêm tiêu đề thẻ để hiển thị rõ tên của danh mục bạn đang sửa (`@Html.DisplayFor(model => model.CategoryName)`), giúp người dùng dễ nhận biết.
+        * **Layout (`<div class="card">
+            `):** Form được bọc trong `card` và `card-body` đồng bộ với các trang khác.
+            * **Form ngang:** Các lớp `form-horizontal`, `form-group` của Bootstrap 3 được thay bằng cấu trúc `row mb-3` của Bootstrap 5.
+            * **Label và Nút bấm:** Tương tự như trang `Create`, các class `col-md-2`, `col-md-10`, `col-md-offset-2` được cập nhật thành `col-sm-2`, `col-sm-10`, `offset-sm-2`...
+            * **Nút bấm:**
+            * Nút "Save" được đổi tên thành "Lưu thay đổi" và đổi class thành `btn btn-primary`.
+            * Link "Back to List" được chuyển lên nằm cạnh nút "Lưu" và đổi class thành `btn btn-secondary`.
+            * **`@Html.HiddenFor(model => model.CategoryID)`:** Trường này rất quan trọng và đã được giữ lại. Nó đảm bảo khi bạn nhấn "Save", form sẽ gửi đúng ID của Category cần sửa.*@

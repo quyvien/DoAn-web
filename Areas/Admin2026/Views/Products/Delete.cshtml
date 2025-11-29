@@ -1,0 +1,106 @@
+﻿@model DoAn_web.Models.Product
+
+@{
+    ViewBag.Title = "Xác nhận xóa sản phẩm"; // 1. Tiêu đề rõ ràng
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm border-danger">
+
+    <div class="card-header">
+        <h4 class="mb-0">@ViewBag.Title: @Html.DisplayFor(model => model.ProductName)</h4>
+    </div>
+
+    <div class="card-body">
+
+        @* --- BẮT ĐẦU: KIỂM TRA RÀNG BUỘC ĐÃ BÁN (SoldQuantity) --- *@
+        @if (Model.SoldQuantity > 0)
+        {
+            <div class="alert alert-warning mb-4">
+                ⚠️ **RÀNG BUỘC ĐÃ BÁN:** Sản phẩm này đã bán được **@Model.SoldQuantity** lần và **KHÔNG THỂ XÓA** để đảm bảo lịch sử đơn hàng.
+                <br />
+                Bạn chỉ có thể lưu trữ (archive) hoặc ẩn nó khỏi website.
+            </div>
+        }
+        @* --- KẾT THÚC: KIỂM TRA RÀNG BUỘC ĐÃ BÁN --- *@
+
+        <div class="alert alert-danger" role="alert">
+            <strong>Cảnh báo!</strong> Bạn có chắc chắn muốn xóa vĩnh viễn sản phẩm này không?
+            <br>
+            Hành động này không thể hoàn tác.
+        </div>
+
+        <h5>Thông tin sản phẩm sắp xóa:</h5>
+
+        <dl class="row">
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.ProductName)
+            </dt>
+            <dd class="col-sm-9">
+                <p class="form-control-plaintext">@Html.DisplayFor(model => model.ProductName)</p>
+            </dd>
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.ProductImage)
+            </dt>
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrEmpty(Model.ProductImage))
+                {
+                    <img src="@Url.Content(Model.ProductImage)"
+                         alt="@Html.DisplayFor(model => model.ProductName)"
+                         style="max-width: 150px; max-height: 150px; border-radius: 5px; object-fit: cover;" />
+                }
+                else
+                {
+                    <span class="form-control-plaintext text-muted">Không có ảnh</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.ProductPrice)
+            </dt>
+            <dd class="col-sm-9">
+                <p class="form-control-plaintext">@(Model.ProductPrice.ToString("N0") + "đ")</p>
+            </dd>
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.Category.CategoryName)
+            </dt>
+            <dd class="col-sm-9">
+                <p class="form-control-plaintext">@Html.DisplayFor(model => model.Category.CategoryName)</p>
+            </dd>
+
+            <dt class="col-sm-3 col-form-label fw-bold">
+                @Html.DisplayNameFor(model => model.ProductDecription)
+            </dt>
+            <dd class="col-sm-9">
+                <p class="form-control-plaintext">@Html.DisplayFor(model => model.ProductDecription)</p>
+            </dd>
+
+        </dl>
+
+    </div>
+
+    <div class="card-footer bg-light">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            @* --- LOGIC NÚT XÓA: CHỈ HIỆN KHI CHƯA CÓ ĐƠN HÀNG --- *@
+            if (Model.SoldQuantity == 0)
+            {
+                <input type="submit" value="Xác nhận Xóa" class="btn btn-danger" />
+            }
+            else
+            {
+                <button type="button" class="btn btn-secondary" disabled title="Không thể xóa do đã có đơn hàng.">
+                    Không thể xóa
+                </button>
+            }
+            @* --- KẾT THÚC LOGIC NÚT XÓA --- *@
+
+            @Html.ActionLink("Quay về", "Index", null, new { @class = "" })
+        }
+    </div>
+</div>

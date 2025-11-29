@@ -1,0 +1,85 @@
+﻿/* File: /Content/style_K/Style_Layout.css */
+
+/* =================================== */
+/* CSS RIÊNG cho Form (Đăng nhập/Ký) */
+/* =================================== */
+
+/* Thùng chứa form */
+.custom-form-container {
+    max-width: 600px; /* Giới hạn chiều rộng form */
+    margin: 50px auto 30px auto; /* Đẩy xuống dưới Header */
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Mỗi dòng (bao gồm label và input) */
+.form-row {
+    margin-bottom: 25px;
+}
+
+/* Nhãn (Tên, Mật khẩu...) */
+.custom-label {
+    display: block; /* Cho nhãn nằm trên 1 dòng */
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+/* Ô nhập liệu (textbox, password) */
+.custom-input {
+    width: 100%; /* Chiếm hết chiều rộng */
+    padding: 10px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Quan trọng, để padding không làm vỡ */
+}
+
+/* Nút bấm (Chung) */
+.custom-button {
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Nút màu xanh (Đăng ký) */
+.button-primary {
+    background-color: #007bff;
+}
+
+    .button-primary:hover {
+        background-color: #0056b3;
+    }
+
+/* Nút màu xanh lá (Đăng nhập) */
+.button-success {
+    background-color: #28a745;
+}
+
+    .button-success:hover {
+        background-color: #218838;
+    }
+
+/* Thông báo lỗi */
+.error-message {
+    padding: 10px;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* Chữ báo lỗi của validation */
+.text-danger {
+    color: #d70018;
+    font-size: 13px;
+    margin-top: 5px;
+}

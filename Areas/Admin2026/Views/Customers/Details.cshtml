@@ -1,0 +1,82 @@
+﻿@model DoAn_web.Models.Customer
+@{
+    ViewBag.Title = "Chi tiết khách hàng";
+    Layout = "~/Areas/Admin2026/Views/Shared/_LayoutAdmin.cshtml";
+    var orderHistory = ViewBag.OrderHistory as List<DoAn_web.Models.Order>;
+}
+
+<div class="mb-3">
+    <a href="@Url.Action("Index")" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Quay lại</a>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Thông tin cá nhân</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <i class="fas fa-user-circle fa-5x text-secondary"></i>
+                    <h4 class="mt-2">@Model.CustomerName</h4>
+                    <span class="badge bg-info text-dark">@Model.Username</span>
+                </div>
+                <hr />
+                <p><strong><i class="fas fa-phone me-2"></i>SĐT:</strong> @Model.CustomerPhone</p>
+                <p><strong><i class="fas fa-envelope me-2"></i>Email:</strong> @Model.CustomerEmail</p>
+                <p><strong><i class="fas fa-map-marker-alt me-2"></i>Địa chỉ:</strong> @Model.CustomerAddress</p>
+
+                <div class="d-grid mt-3">
+                    <a href="@Url.Action("Edit", new { id = Model.CustomerID })" class="btn btn-warning"><i class="fas fa-edit"></i> Chỉnh sửa thông tin</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Lịch sử Đơn hàng (@(orderHistory != null ? orderHistory.Count : 0))</h5>
+            </div>
+            <div class="card-body p-0">
+                @if (orderHistory != null && orderHistory.Count > 0)
+                {
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Mã ĐH</th>
+                                <th>Ngày đặt</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in orderHistory)
+                            {
+                                <tr>
+                                    <td>#@order.OrderID</td>
+                                    <td>@order.OrderDate.ToString("dd/MM/yyyy")</td>
+                                    <td class="fw-bold text-danger">@String.Format("{0:N0}", order.TotalAmount) đ</td>
+                                    <td>
+                                        @if (order.PaymentStatus == "Đã thanh toán")
+                                        {<span class="badge bg-success">Đã thanh toán</span> }
+                                        else
+                                        { <span class="badge bg-warning text-dark">@order.PaymentStatus</span>}
+                                    </td>
+                                    <td>
+                                        <a href="@Url.Action("Edit", "Orders", new { id = order.OrderID })" class="btn btn-sm btn-outline-primary">Xem</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="p-4 text-center text-muted">Khách hàng này chưa có đơn hàng nào.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
