@@ -11,13 +11,16 @@ body {
 
 /* === PHẦN NAVBAR (Sửa lỗi co giãn) === */
 .navbar {
-    display: flex;
-    justify-content: space-between; /* Co giãn linh hoạt */
-    align-items: center;
     background-color: #141924;
     color: white;
-    padding: 10px 40px; /* Thêm padding 2 bên */
-    position: relative;
+}
+.navbar-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 40px;
+    max-width: 1200px; /* content chỉ rộng tối đa 1200px */
+    margin: 0 auto; /* căn giữa trong thanh navbar */
     flex-wrap: nowrap;
 }
 
@@ -305,7 +308,7 @@ display: flex;
 /* 1. MÁY TÍNH BẢNG (Tablet) - 992px trở xuống */
 @media (max-width: 992px) {
     /* --- HEADER (2 hàng) --- */
-    .navbar {
+    .navbar-inner {
         flex-wrap: wrap;
         gap: 10px;
         padding: 10px 20px;
@@ -321,7 +324,12 @@ display: flex;
         gap: 20px;
     }
     /* Giảm gap 1 chút */
-
+    .nav-center {
+        order: 3;
+        width: 100%;
+        padding: 0;
+        min-width: unset;
+    }
     /* SỬA: Giấu chữ, chừa icon (có thể bấm) */
     .nav-item-text {
         display: none;
@@ -335,13 +343,6 @@ display: flex;
 
     .menu-toggle {
         display: block;
-    }
-
-    .nav-center {
-        order: 3;
-        width: 100%;
-        padding: 0;
-        min-width: unset;
     }
 
     .search-box {

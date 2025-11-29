@@ -11,118 +11,118 @@
 </head>
 <body>
     <header class="navbar">
-        <div class="nav-left">
-            <a href="/Default/Index"><i class="fab fa-app-store fa-lg" style=" font-size:65px; padding-top:10px;padding-bottom:10px; color:white"></i></a>
-        </div>
-
-        <div class="nav-center">
-            <div class="search-box" style="position:relative">
-                @using (Html.BeginForm("Index", "Product", FormMethod.Get))
-                {
-                    <div style="display:flex; width:100%; align-items:center;">
-                        <i class="fas fa-search"></i>
-                        @Html.TextBox("searchString", null, new
-                   {
-                       @id = "live-search-box",
-                       @placeholder = "Bạn tìm gì...",
-                       @style = "border:none; outline:none; flex-grow:1; margin-left: 10px;",
-                       autocomplete = "off",
-                        data_url = @Url.Action("LiveSearch", "Product")
-                   })
-                        <input type="submit" value="" style="display:none;" />
-                    </div>
-                }
-                <div id="search-results">
-                    @*   hoi js se do het html vao day  *@
-                </div>
+        <div class="navbar-inner">
+            <div class="nav-left">
+                <a href="/Default/Index"><i class="fab fa-app-store fa-lg" style=" font-size:65px; padding-top:10px;padding-bottom:10px; color:white"></i></a>
             </div>
 
-
-
-        </div>
-
-
-        
-
-        <div class="nav-right">
-
-            @* kiem tra coi dang nhap chua *@
-            @if (User.Identity.IsAuthenticated)
-            {
-                @* da dang nhap *@
-
-                @* hien chuoi chao mung *@
-                <div class="nav-item">
-                    <span class="nav-item-text" style="color: white; padding-right: 15px;">Chào, @User.Identity.Name!</span>
+            <div class="nav-center">
+                <div class="search-box" style="position:relative">
+                    @using (Html.BeginForm("Index", "Product", FormMethod.Get))
+                    {
+                        <div style="display:flex; width:100%; align-items:center;">
+                            <i class="fas fa-search"></i>
+                            @Html.TextBox("searchString", null, new
+                       {
+                           @id = "live-search-box",
+                           @placeholder = "Bạn tìm gì...",
+                           @style = "border:none; outline:none; flex-grow:1; margin-left: 10px;",
+                           autocomplete = "off",
+                            data_url = @Url.Action("LiveSearch", "Product")
+                       })
+                            <input type="submit" value="" style="display:none;" />
+                        </div>
+                    }
+                    <div id="search-results">
+                        @*   hoi js se do het html vao day  *@
+                    </div>
                 </div>
 
-                @* 🔥 SỬA Ở ĐÂY: Thêm dấu @ *@
-                if (User.IsInRole("A"))
-                {
-                    @* neu la Admin  *@
-                    <div class="nav-item">
 
-                        <a href="@Url.Action("Index", "Home", new { area = "Admin2026" })">
-                            <i class="fas fa-cog"></i>
-                            <span class="nav-item-text">Quản Trị</span>
+
+            </div>
+
+            <div class="nav-right">
+
+                @* kiem tra coi dang nhap chua *@
+                @if (User.Identity.IsAuthenticated)
+                {
+                    @* da dang nhap *@
+
+                    @* hien chuoi chao mung *@
+                    <div class="nav-item">
+                        <span class="nav-item-text" style="color: white; padding-right: 15px;">Chào, @User.Identity.Name!</span>
+                    </div>
+
+                    @* 🔥 SỬA Ở ĐÂY: Thêm dấu @ *@
+                    if (User.IsInRole("A"))
+                    {
+                        @* neu la Admin  *@
+                        <div class="nav-item">
+
+                            <a href="@Url.Action("Index", "Home", new { area = "Admin2026" })">
+                                <i class="fas fa-cog"></i>
+                                <span class="nav-item-text">Quản Trị</span>
+                            </a>
+                        </div>
+                    }
+                    @* 🔥 SỬA Ở ĐÂY: Thêm dấu @ *@
+                    else if (User.IsInRole("C"))
+                    {
+                        @* Nchi toi lich su mua hang *@
+                        <div class="nav-item">
+
+                            <a href="@Url.Action("OrderHistory", "Default")">
+                                <i class="fas fa-history"></i>
+                                <span class="nav-item-text">Lịch Sử Đơn Hàng</span>
+                            </a>
+                        </div>
+                    }
+
+
+                    <div class="nav-item">
+                        <a href="@Url.Action("Index", "Cart")">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="nav-item-text">Giỏ hàng</span>
+                        </a>
+                    </div>
+
+
+                    <div class="nav-item">
+                        <a href="@Url.Action("Logout", "Account")">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span class="nav-item-text">Đăng xuất</span>
                         </a>
                     </div>
                 }
-                @* 🔥 SỬA Ở ĐÂY: Thêm dấu @ *@
-                else if (User.IsInRole("C"))
+                else
                 {
-                    @* Nchi toi lich su mua hang *@
-                    <div class="nav-item">
 
-                        <a href="@Url.Action("OrderHistory", "Default")">
-                            <i class="fas fa-history"></i>
-                            <span class="nav-item-text">Lịch Sử Đơn Hàng</span>
+                    @* Link Giỏ hàng (Code này của bạn đã đúng) *@
+                    <div class="nav-item">
+                        <a href="@Url.Action("Index", "Cart")">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="nav-item-text">Giỏ hàng</span>
+                        </a>
+                    </div>
+
+                    @* hien thi link dang nhap *@
+                    <div class="nav-item">
+                        <a href="@Url.Action("Login", "Account")">
+                            <i class="far fa-user"></i>
+                            <span class="nav-item-text">Tài khoản</span>
                         </a>
                     </div>
                 }
 
-
-                <div class="nav-item">
-                    <a href="@Url.Action("Index", "Cart")">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="nav-item-text">Giỏ hàng</span>
-                    </a>
+                @* Nút Menu Toggle (Giữ nguyên) *@
+                <div class="menu-toggle" id="menu-toggle">
+                    <i class="fas fa-bars"></i>
                 </div>
 
-
-                <div class="nav-item">
-                    <a href="@Url.Action("Logout", "Account")">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span class="nav-item-text">Đăng xuất</span>
-                    </a>
-                </div>
-            }
-            else
-            {
-
-                @* Link Giỏ hàng (Code này của bạn đã đúng) *@
-                <div class="nav-item">
-                    <a href="@Url.Action("Index", "Cart")">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="nav-item-text">Giỏ hàng</span>
-                    </a>
-                </div>
-
-                @* hien thi link dang nhap *@
-                <div class="nav-item">
-                    <a href="@Url.Action("Login", "Account")">
-                        <i class="far fa-user"></i>
-                        <span class="nav-item-text">Tài khoản</span>
-                    </a>
-                </div>
-            }
-
-            @* Nút Menu Toggle (Giữ nguyên) *@
-            <div class="menu-toggle" id="menu-toggle">
-                <i class="fas fa-bars"></i>
             </div>
-
         </div>
+            
     </header>
 
     <nav class="subnav" id="subnav">

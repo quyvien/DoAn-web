@@ -1,18 +1,17 @@
 ﻿@model List<DoAn_web.Models.Order>
+
 @{
     ViewBag.Title = "Lịch sử mua hàng";
     Layout = "~/Views/Shared/_HomeLayout.cshtml";
 }
 
-@* 1. Tải file CSS (đảm bảo tên file đúng) *@
 <link href="~/Content/style_K/Style_OrderHistory.css" rel="stylesheet" />
 
-@* 2. Thay "container" bằng "history-container" và bỏ style inline *@
 <div class="history-container">
     <h2>Lịch sử mua hàng</h2>
     <hr />
 
-    @if (!Model.Any())
+    @if (Model == null || !Model.Any())
     {
         <p>Bạn chưa có đơn hàng nào.</p>
     }
@@ -20,61 +19,79 @@
     {
         foreach (var order in Model)
         {
-            @* 3. Thay "panel" bằng "order-card" *@
             <div class="order-card">
-
-                @* 4. Thay "panel-heading" bằng "order-card-header" *@
+                <!-- HEADER -->
                 <div class="order-card-header">
-                    @* 5. Tách <h4> thành 2 phần (thay cho pull-right) *@
                     <span class="order-id">Đơn hàng #@order.OrderID</span>
-                    <span class="order-total-price">Tổng tiền: @String.Format("{0:N0}", order.TotalAmount) đ</span>
+                    <span class="order-total-price">
+                        Tổng tiền: @order.TotalAmount.ToString("N0") đ
+                    </span>
                 </div>
 
+                <!-- BODY -->
                 <div class="order-card-body">
 
-                    <div class="order-info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Ngày đặt:</span>
-                            <span class="info-value">@order.OrderDate.ToString("dd/MM/yyyy")</span>
+                    <!-- Thông tin đơn: 2 cột trái/phải -->
+                    <div class="order-info-row">
+                        <!-- Cột trái -->
+                        <div class="info-col">
+                            <div class="info-line">
+                                <span class="info-label">Ngày đặt:</span>
+                                <span class="info-value">
+                                    @order.OrderDate.ToString("dd/MM/yyyy")
+                                </span>
+                            </div>
+                            <div class="info-line">
+                                <span class="info-label">Giao đến:</span>
+                                <span class="info-value">@order.AddressDelivery</span>
+                            </div>
                         </div>
-                        <div class="info-item">
-                            <span class="info-label">Trạng thái đơn hàng:</span>
-                            <span class="info-value" style="color: #d70018; font-weight: 600;">@order.PaymentStatus</span>
-                        </div>
-                        <div class="info-item full-width">
-                            <span class="info-label">Giao đến:</span>
-                            <span class="info-value">@order.AddressDelivery</span>
-                        </div>
-                        <div class="info-item full-width">
-                            <span class="info-label">Tình trạng:</span>
-                            <span class="info-value">@order.ShippingStatus</span>
+
+                        <!-- Cột phải -->
+                        <div class="info-col info-col-right">
+                            <div class="info-line">
+                                <span class="info-label">Tình trạng:</span>
+                                <span class="info-value">@order.ShippingStatus</span>
+                            </div>
+                            <div class="info-line">
+                                <span class="info-label">Trạng thái đơn hàng:</span>
+                                <span class="info-value payment-status">
+                                    @order.PaymentStatus
+                                </span>
+                            </div>
                         </div>
                     </div>
 
                     <div class="divider"></div>
 
-                    @* Danh sách sản phẩm *@
+                    <!-- Danh sách sản phẩm -->
                     <table class="product-table">
                         @foreach (var detail in order.OrderDetails)
                         {
                             <tr>
                                 <td class="prod-img">
-                                    <img src="@Url.Content(detail.Product.ProductImage)" />
+                                    <img src="@Url.Content(detail.Product.ProductImage)"
+                                         alt="@detail.Product.ProductName" />
                                 </td>
                                 <td class="prod-info">
                                     <div class="prod-name">@detail.Product.ProductName</div>
                                     <div class="prod-qty">x @detail.Quantity</div>
                                 </td>
                                 <td class="prod-price">
-                                    @String.Format("{0:N0}", detail.UnitPrice) đ
+                                    @detail.UnitPrice.ToString("N0") đ
                                 </td>
                             </tr>
-
                         }
                     </table>
+
+                    <!-- Footer: nút huỷ đơn -->
                     <div class="action-footer">
-                        @*Chỉ hiện nút huỷ khi có những trạng thái duới*@
-                        @if ((order.PaymentStatus == "Chờ xác nhận chuyển khoản"|| order.PaymentStatus == "Chờ xác nhận chuyển khoảng" || order.PaymentStatus == "Chờ xử lý" || order.PaymentStatus == "Chưa thanh toán") && order.ShippingStatus != "Đang vận chuyển" && order.ShippingStatus != "Đã giao thành công")
+                        @if ((order.PaymentStatus == "Chờ xác nhận chuyển khoản"
+                              || order.PaymentStatus == "Chờ xác nhận chuyển khoảng"
+                              || order.PaymentStatus == "Chờ xử lý"
+                              || order.PaymentStatus == "Chưa thanh toán")
+                              && order.ShippingStatus != "Đang vận chuyển"
+                              && order.ShippingStatus != "Đã giao thành công")
                         {
                             <a href="@Url.Action("CancelOrder", "Default", new { id = order.OrderID })"
                                class="btn-cancel-order"
@@ -82,11 +99,14 @@
                                 Huỷ đơn hàng
                             </a>
                         }
-                        @if (order.PaymentStatus == "Đã huỷ" || order.PaymentStatus == "Đã huỷ !")
+                        else if (order.PaymentStatus == "Đã huỷ" || order.PaymentStatus == "Đã huỷ !")
                         {
-                            <span style="color: #999; font-style: italic;">Đơn hàng đã được hủy</span>
+                            <span style="color: #999; font-style: italic;">
+                                Đơn hàng đã được hủy
+                            </span>
                         }
                     </div>
+
                 </div>
             </div>
         }
