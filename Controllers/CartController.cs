@@ -2,6 +2,7 @@
 using DoAn_web.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -33,6 +34,12 @@ namespace DoAn_web.Controllers
         // Trả về true nếu thêm OK, false nếu không đủ hàng / lỗi
         private bool AddItemToCart(int productID, int quantity)
         {
+            if (quantity <= 0)
+            {
+                TempData["Error"] = "Số lượng sản phẩm phải lớn hơn 0.";
+                return false;
+            }
+
             List<CartItem> cart = GetCart();
             CartItem item = cart.Where(i => i != null)
                                 .FirstOrDefault(i => i.ProductID == productID);
@@ -61,7 +68,7 @@ namespace DoAn_web.Controllers
                                    f.StartDate <= DateTime.Now &&
                                    f.EndDate >= DateTime.Now);
             // kiem tra coi con suat giam gia ko
-            if(activeFlashSale != null && activeFlashSale.SoldQuantity<activeFlashSale.SaleQuantityLimit)
+            if (activeFlashSale != null && activeFlashSale.SoldQuantity + requiredQuantity <= activeFlashSale.SaleQuantityLimit)
             {
                 finalPrice = activeFlashSale.SalePrice;
                 // neu thoa man thi lay gia tri ale
@@ -193,7 +200,7 @@ namespace DoAn_web.Controllers
             }
 
             item.Quantity = newQuantity;
-            SaveCart(cart);
+            RefreshCartPrices(cart, DateTime.Now);
 
             return RedirectToAction("Index");
         }
@@ -211,9 +218,16 @@ namespace DoAn_web.Controllers
                 return Json(new { success = false, message = "Không tìm thấy sản phẩm" },
                             JsonRequestBehavior.AllowGet);
 
-            item.Quantity += change;
-            if (item.Quantity < 1)
-                item.Quantity = 1;
+            var product = db.Products.Find(productID);
+            if (product == null)
+                return Json(new { success = false, message = "Sản phẩm không còn tồn tại" });
+
+            var newQuantity = Math.Max(1, item.Quantity + change);
+            if (newQuantity > product.Quantity)
+                return Json(new { success = false, message = $"Sản phẩm chỉ còn {product.Quantity} sản phẩm" });
+
+            item.Quantity = newQuantity;
+            RefreshCartPrices(cart, DateTime.Now);
 
             decimal cartTotal = cart.Sum(x => x.TotalPrice);
 
@@ -259,17 +273,34 @@ namespace DoAn_web.Controllers
                 return RedirectToAction("Index");
             }
 
+            try
+            {
+                RefreshCartPrices(cart, DateTime.Now);
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Index");
+            }
+
             int customerID = GetCurrentCustomerID();
             var customer = db.Customers.Find(customerID);
+            if (customer == null)
+            {
+                return new HttpStatusCodeResult(403);
+            }
 
             ViewBag.Cart = cart;
             ViewBag.Customer = customer;
             // lay thong tin giam gia tu session neu co
-            ViewBag.DiscountID = Session["DiscountID"];
-            ViewBag.DiscountAmount = (decimal?)Session["DiscountAmount"] ?? 0 ;
             decimal subtotal = GetCartSubtotal(cart);
-            decimal finalTotal = subtotal - (decimal)ViewBag.DiscountAmount;
-            ViewBag.FinalTotal = finalTotal;
+            int? discountID;
+            decimal discountAmount = GetCurrentDiscountAmount(subtotal, DateTime.Now, out discountID);
+            Session["DiscountID"] = discountID;
+            Session["DiscountAmount"] = discountAmount;
+            ViewBag.DiscountID = discountID;
+            ViewBag.DiscountAmount = discountAmount;
+            ViewBag.FinalTotal = subtotal - discountAmount;
 
             return View();
         }
@@ -277,7 +308,7 @@ namespace DoAn_web.Controllers
         [HttpPost]
         [Authorize(Roles = "C")]
         [ValidateAntiForgeryToken]
-        public ActionResult PlaceOrder(string AddressDelivery, decimal TotalAmount, string PaymentMethod)
+        public ActionResult PlaceOrder(string AddressDelivery, string PaymentMethod)
         {
             List<CartItem> cart = GetCart();
             if (cart.Count == 0 || cart.Any(i => i == null))
@@ -285,63 +316,73 @@ namespace DoAn_web.Controllers
                 return RedirectToAction("Index");
             }
 
+            if (string.IsNullOrWhiteSpace(AddressDelivery) || AddressDelivery.Trim().Length > 500)
+            {
+                return ShowCheckoutError(cart, "Vui lòng nhập địa chỉ giao hàng hợp lệ.");
+            }
+
+            if (PaymentMethod != "Tiền mặt (COD)" && PaymentMethod != "Chuyển khoản")
+            {
+                return ShowCheckoutError(cart, "Phương thức thanh toán không hợp lệ.");
+            }
+
             try
             {
-                var order = new Order();
-                order.CustomerID = GetCurrentCustomerID();
-                order.OrderDate = DateTime.Now;
-                order.TotalAmount = TotalAmount;
-                order.AddressDelivery = AddressDelivery;
-
-                order.PaymentStatus = (PaymentMethod == "Tiền mặt (COD)")
-                                      ? "Chờ xử lý"
-                                      : "Chờ xác nhận chuyển khoảng";
-
-                order.ShippingStatus = "Chờ lấy hàng";
-                // lay thong tin tu session da luu trong ApplyCoupon
-                order.DiscountID = (int?)Session["DiscountID"];
-                order.DiscountAmount = (decimal?)Session["DiscountAmount"] ?? 0; // Lưu số tiền giảm
-
-                db.Orders.Add(order);
-                db.SaveChanges(); // để có OrderID
-
-                foreach (var item in cart)
+                using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
                 {
-                    if (item != null)
+                    var now = DateTime.Now;
+                    RefreshCartPrices(cart, now);
+
+                    var customerID = GetCurrentCustomerID();
+                    if (customerID == 0)
+                    {
+                        throw new InvalidOperationException("Không tìm thấy thông tin khách hàng.");
+                    }
+
+                    var subtotal = GetCartSubtotal(cart);
+                    int? discountID;
+                    var discountAmount = GetCurrentDiscountAmount(subtotal, now, out discountID);
+                    var order = new Order
+                    {
+                        CustomerID = customerID,
+                        OrderDate = now,
+                        TotalAmount = subtotal - discountAmount,
+                        AddressDelivery = AddressDelivery.Trim(),
+                        PaymentStatus = PaymentMethod == "Tiền mặt (COD)" ? "Chờ xử lý" : "Chờ xác nhận chuyển khoản",
+                        ShippingStatus = "Chờ lấy hàng",
+                        DiscountID = discountID,
+                        DiscountAmount = discountAmount
+                    };
+
+                    foreach (var item in cart)
                     {
                         var product = db.Products.Find(item.ProductID);
-
-                        if (product != null && product.Quantity >= item.Quantity)
+                        if (product == null || product.Quantity < item.Quantity)
                         {
-                            var detail = new OrderDetail();
-                            detail.OrderID = order.OrderID;
-                            detail.ProductID = item.ProductID;
-                            detail.Quantity = item.Quantity;
-                            detail.UnitPrice = item.UnitPrice;
-                            db.OrderDetails.Add(detail);
-                            // ton kho
-                            product.Quantity = product.Quantity - item.Quantity;
-                            product.SoldQuantity = product.SoldQuantity + item.Quantity;
-                            // flash sale
-                            var flashSaleItem = db.FlashSaleItems.FirstOrDefault(f =>
-                         f.ProductID == item.ProductID &&
-                         f.IsActive == true &&
-                         f.StartDate <= DateTime.Now &&
-                         f.EndDate >= DateTime.Now);
-                            if (flashSaleItem != null)
-                            {
-                                // Cộng thêm số lượng khách vừa mua vào Flash Sale
-                                flashSaleItem.SoldQuantity += item.Quantity;
-                            }
+                            throw new InvalidOperationException($"Sản phẩm {item.ProductName} không đủ số lượng tồn kho.");
                         }
-                        else
+
+                        order.OrderDetails.Add(new OrderDetail
                         {
-                            throw new Exception($"Sản phẩm {item.ProductName} không đủ số lượng tồn kho (Hiện còn: {product?.Quantity ?? 0}).");
+                            ProductID = item.ProductID,
+                            Quantity = item.Quantity,
+                            UnitPrice = item.UnitPrice
+                        });
+                        product.Quantity -= item.Quantity;
+                        product.SoldQuantity += item.Quantity;
+
+                        var flashSaleItem = FindAvailableFlashSale(item.ProductID, item.Quantity, now);
+                        if (flashSaleItem != null && item.UnitPrice == flashSaleItem.SalePrice)
+                        {
+                            flashSaleItem.SoldQuantity += item.Quantity;
                         }
                     }
+
+                    db.Orders.Add(order);
+                    db.SaveChanges();
+                    transaction.Commit();
                 }
 
-                db.SaveChanges();
                 // xoa session sau khi dat hang thanh cong
                 Session["Cart"] = null;
                 Session["DiscountID"] = null; // xoa discountid
@@ -350,15 +391,13 @@ namespace DoAn_web.Controllers
 
                 return RedirectToAction("OrderHistory", "Default");
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
             {
-                ViewBag.DiscountAmount = (decimal?)Session["DiscountAmount"] ?? 0;
-                ViewBag.FinalTotal = GetCartSubtotal(cart) - ViewBag.DiscountAmount;
-                ViewBag.Error = "Lỗi đặt hàng: " + ex.Message;
-
-                ViewBag.Cart = cart;
-                ViewBag.Customer = db.Customers.Find(GetCurrentCustomerID());
-                return View("Checkout");
+                return ShowCheckoutError(cart, ex.Message);
+            }
+            catch (Exception)
+            {
+                return ShowCheckoutError(cart, "Không thể tạo đơn hàng lúc này. Vui lòng thử lại sau.");
             }
         }
 
@@ -376,6 +415,98 @@ namespace DoAn_web.Controllers
             if (cart == null || cart.Count == 0 || cart.Any(i => i == null)) return 0;
             return cart.Sum(i => i.Quantity * i.UnitPrice);
         }
+
+        private FlashSaleItem FindAvailableFlashSale(int productID, int quantity, DateTime now)
+        {
+            return db.FlashSaleItems.FirstOrDefault(f =>
+                f.ProductID == productID &&
+                f.IsActive &&
+                f.StartDate <= now &&
+                f.EndDate >= now &&
+                f.SoldQuantity + quantity <= f.SaleQuantityLimit);
+        }
+
+        private void RefreshCartPrices(List<CartItem> cart, DateTime now)
+        {
+            foreach (var item in cart)
+            {
+                if (item == null || item.Quantity <= 0)
+                {
+                    throw new InvalidOperationException("Giỏ hàng chứa sản phẩm không hợp lệ.");
+                }
+
+                var product = db.Products.Find(item.ProductID);
+                if (product == null)
+                {
+                    throw new InvalidOperationException("Một sản phẩm trong giỏ không còn tồn tại.");
+                }
+
+                if (product.Quantity < item.Quantity)
+                {
+                    throw new InvalidOperationException($"Sản phẩm {product.ProductName} chỉ còn {product.Quantity} sản phẩm.");
+                }
+
+                var flashSale = FindAvailableFlashSale(product.ProductID, item.Quantity, now);
+                item.ProductName = product.ProductName;
+                item.ProductImage = product.ProductImage;
+                item.OriginalPrice = product.ProductPrice;
+                item.UnitPrice = flashSale == null ? product.ProductPrice : flashSale.SalePrice;
+            }
+
+            SaveCart(cart);
+        }
+
+        private decimal GetCurrentDiscountAmount(decimal subtotal, DateTime now, out int? discountID)
+        {
+            discountID = Session["DiscountID"] as int?;
+            if (!discountID.HasValue)
+            {
+                return 0;
+            }
+
+            var discount = db.Discounts.Find(discountID.Value);
+            if (discount == null || !discount.IsActive || discount.StartDate > now || discount.EndDate < now ||
+                (discount.MinimumOrderAmount.HasValue && subtotal < discount.MinimumOrderAmount.Value))
+            {
+                discountID = null;
+                return 0;
+            }
+
+            decimal amount;
+            if (discount.DiscountType == "Percentage")
+            {
+                amount = subtotal * discount.DiscountValue / 100;
+                if (discount.MaxDiscountAmount.HasValue)
+                {
+                    amount = Math.Min(amount, discount.MaxDiscountAmount.Value);
+                }
+            }
+            else if (discount.DiscountType == "FixedAmount")
+            {
+                amount = discount.DiscountValue;
+            }
+            else
+            {
+                discountID = null;
+                return 0;
+            }
+
+            return Math.Max(0, Math.Min(amount, subtotal));
+        }
+
+        private ActionResult ShowCheckoutError(List<CartItem> cart, string message)
+        {
+            var subtotal = GetCartSubtotal(cart);
+            int? discountID;
+            var discountAmount = GetCurrentDiscountAmount(subtotal, DateTime.Now, out discountID);
+            ViewBag.Cart = cart;
+            ViewBag.Customer = db.Customers.Find(GetCurrentCustomerID());
+            ViewBag.DiscountAmount = discountAmount;
+            ViewBag.FinalTotal = subtotal - discountAmount;
+            ViewBag.Error = message;
+            return View("Checkout");
+        }
+
         // ham xu li giam gia neu co
         [HttpPost]
         [Authorize(Roles = "C")]
@@ -388,6 +519,15 @@ namespace DoAn_web.Controllers
                 return RedirectToAction("Checkout");
             }
             List<CartItem> cart = GetCart();
+            try
+            {
+                RefreshCartPrices(cart, DateTime.Now);
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Index");
+            }
             decimal cartSubtotal = GetCartSubtotal(cart);
             var discount = db.Discounts
                     .FirstOrDefault(d => d.CouponCode == couponCode &&
@@ -399,6 +539,7 @@ namespace DoAn_web.Controllers
             {
                 TempData["Error"] = "Mã giảm giá không hợp lệ hoặc đã hết hạn.";
                 Session["DiscountAmount"] = null;
+                Session["DiscountID"] = null;
                 Session["AppliedCoupon"] = null;
                 return RedirectToAction("Checkout");
             }

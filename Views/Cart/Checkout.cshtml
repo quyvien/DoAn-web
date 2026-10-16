@@ -38,6 +38,12 @@
             @TempData["Success"]
         </div>
     }
+    @if (ViewBag.Error != null)
+    {
+        <div style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+            @ViewBag.Error
+        </div>
+    }
 
     <hr />
     <div class="checkout-row">
@@ -133,9 +139,6 @@
                 </div>
 
                 <hr />
-
-                @* Gửi tổng số tiền đi (QUAN TRỌNG: Gửi finalTotal thay vì totalAmount) *@
-                <input type="hidden" name="TotalAmount" value="@finalTotal" />
 
                 <div class="form-row" style="margin-top: 20px;">
                     <button type="submit" class="custom-button button-success" style="width: 100%;">

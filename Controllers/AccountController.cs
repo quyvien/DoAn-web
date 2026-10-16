@@ -37,25 +37,27 @@ namespace DoAn_web.Controllers
 
                 try
                 {
-                    // 2. BƯỚC 1: Tạo và LƯU User trước
-                    var user = new User();
-                    user.Username = model.Username;
-                    user.UserRole = "C";
-                    user.Password = PasswordHasher.Hash(model.Password);
+                    using (var transaction = db.Database.BeginTransaction())
+                    {
+                        var user = new User();
+                        user.Username = model.Username;
+                        user.UserRole = "C";
+                        user.Password = PasswordHasher.Hash(model.Password);
 
-                    db.Users.Add(user);
-                    db.SaveChanges(); // <--- Lưu User để lấy Username
+                        db.Users.Add(user);
+                        db.SaveChanges();
 
-                    // 3. BƯỚC 2: Tạo và Lưu Customer
-                    var customer = new Customer();
-                    customer.CustomerName = model.CustomerName;
-                    customer.CustomerPhone = model.CustomerPhone;
-                    customer.CustomerEmail = model.CustomerEmail;
-                    customer.CustomerAddress = model.CustomerAddress;
-                    customer.Username = model.Username; // Username đã an toàn tồn tại
+                        var customer = new Customer();
+                        customer.CustomerName = model.CustomerName;
+                        customer.CustomerPhone = model.CustomerPhone;
+                        customer.CustomerEmail = model.CustomerEmail;
+                        customer.CustomerAddress = model.CustomerAddress;
+                        customer.Username = model.Username;
 
-                    db.Customers.Add(customer);
-                    db.SaveChanges(); // <--- Lưu Customer
+                        db.Customers.Add(customer);
+                        db.SaveChanges();
+                        transaction.Commit();
+                    }
 
                     // Thành công thì chuyển hướng
                     return RedirectToAction("Login");
