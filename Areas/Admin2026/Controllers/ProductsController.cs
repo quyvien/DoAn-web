@@ -15,7 +15,87 @@ namespace DoAn_web.Areas.Admin2026.Controllers
     [Authorize(Roles = "A")]
     public class ProductsController : Controller
     {
+        private const int MaxImageSize = 5 * 1024 * 1024;
+        private static readonly HashSet<string> AllowedImageExtensions =
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".gif" };
         private MyStore2026Entities db = new MyStore2026Entities();
+
+        private void LoadProductOptions(Product product = null)
+        {
+            ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "CategoryName", product?.CategoryID);
+            ViewBag.ColorID = new SelectList(db.Colors, "ColorID", "ColorName", product?.ColorID);
+            ViewBag.StorageID = new SelectList(db.Storages, "StorageID", "StorageName", product?.StorageID);
+        }
+
+        private void ValidateProductInput(Product product)
+        {
+            if (string.IsNullOrWhiteSpace(product.ProductName))
+            {
+                ModelState.AddModelError("ProductName", "Vui lòng nhập tên sản phẩm.");
+            }
+
+            if (product.ProductPrice < 0)
+            {
+                ModelState.AddModelError("ProductPrice", "Giá sản phẩm không được âm.");
+            }
+
+            if (product.Quantity < 0)
+            {
+                ModelState.AddModelError("Quantity", "Số lượng sản phẩm không được âm.");
+            }
+        }
+
+        private bool TrySaveProductImage(HttpPostedFileBase imageFile, out string virtualPath, out string error)
+        {
+            virtualPath = null;
+            error = null;
+
+            if (imageFile == null || imageFile.ContentLength == 0)
+            {
+                return true;
+            }
+
+            var extension = Path.GetExtension(imageFile.FileName);
+            if (imageFile.ContentLength > MaxImageSize)
+            {
+                error = "Ảnh sản phẩm không được vượt quá 5 MB.";
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(extension) || !AllowedImageExtensions.Contains(extension))
+            {
+                error = "Chỉ chấp nhận ảnh JPG, JPEG, PNG hoặc GIF.";
+                return false;
+            }
+
+            try
+            {
+                using (var image = System.Drawing.Image.FromStream(imageFile.InputStream, true, true))
+                {
+                    if (image.Width <= 0 || image.Height <= 0)
+                    {
+                        throw new ArgumentException();
+                    }
+                }
+
+                if (imageFile.InputStream.CanSeek)
+                {
+                    imageFile.InputStream.Position = 0;
+                }
+            }
+            catch (Exception ex) when (ex is ArgumentException || ex is OutOfMemoryException)
+            {
+                error = "Tệp tải lên không phải là ảnh hợp lệ.";
+                return false;
+            }
+
+            var directoryPath = Server.MapPath("~/Content/Images/Products/");
+            Directory.CreateDirectory(directoryPath);
+            var safeFileName = Guid.NewGuid().ToString("N") + extension.ToLowerInvariant();
+            imageFile.SaveAs(Path.Combine(directoryPath, safeFileName));
+            virtualPath = "~/Content/Images/Products/" + safeFileName;
+            return true;
+        }
 
         // GET: Admin2026/Products
         public ActionResult Index(string searchString, decimal? minPrice, decimal? maxPrice, int? page)
@@ -27,8 +107,8 @@ namespace DoAn_web.Areas.Admin2026.Controllers
             {
                 string searchUpper = searchString.ToUpper();
                 products = products.Where(p =>
-                    p.ProductName.ToUpper().Contains(searchUpper) ||
-                    p.ProductDecription.ToUpper().Contains(searchUpper)
+                    (p.ProductName != null && p.ProductName.ToUpper().Contains(searchUpper)) ||
+                    (p.ProductDecription != null && p.ProductDecription.ToUpper().Contains(searchUpper))
                 );
             }
 
@@ -67,10 +147,7 @@ namespace DoAn_web.Areas.Admin2026.Controllers
         // GET: Admin2026/Products/Create
         public ActionResult Create()
         {
-            ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "CategoryName");
-            ViewBag.ColorID = new SelectList(db.Colors, "ColorID", "ColorName");
-            ViewBag.StorageID = new SelectList(db.Storages, "StorageID", "StorageName");
-
+            LoadProductOptions();
             return View();
         }
 
@@ -80,6 +157,7 @@ namespace DoAn_web.Areas.Admin2026.Controllers
         // Thêm Quantity vào Bind để cho phép nhập số lượng ban đầu
         public ActionResult Create([Bind(Include = "ProductID,ProductName,ProductDecription,ProductPrice,CategoryID,Quantity,ColorID,StorageID")] Product product, HttpPostedFileBase ImageFile)
         {
+            ValidateProductInput(product);
             if (ModelState.IsValid)
             {
                 // 1. RÀNG BUỘC: KIỂM TRA TRÙNG TÊN SẢN PHẨM
@@ -91,28 +169,18 @@ namespace DoAn_web.Areas.Admin2026.Controllers
                     return View(product);
                 }
 
-                // 2. XỬ LÝ ẢNH
-                if (ImageFile != null && ImageFile.ContentLength > 0)
+                string imagePath;
+                string imageError;
+                if (!TrySaveProductImage(ImageFile, out imagePath, out imageError))
                 {
-                    var fileName = Path.GetFileName(ImageFile.FileName);
-                    // Thêm timestamp để tránh trùng tên file ảnh
-                    var fileNameWithTime = DateTime.Now.Ticks + "_" + fileName;
-                    var serverPath = Path.Combine(Server.MapPath("~/Content/Images/Products/"), fileNameWithTime);
-
-                    // Kiểm tra thư mục tồn tại chưa, nếu chưa thì tạo
-                    string directoryPath = Server.MapPath("~/Content/Images/Products/");
-                    if (!Directory.Exists(directoryPath))
-                    {
-                        Directory.CreateDirectory(directoryPath);
-                    }
-
-                    ImageFile.SaveAs(serverPath);
-                    product.ProductImage = "~/Content/Images/Products/" + fileNameWithTime;
+                    ModelState.AddModelError("ImageFile", imageError);
+                    LoadProductOptions(product);
+                    return View(product);
                 }
-                else
+
+                if (imagePath != null)
                 {
-                    // Nếu không up ảnh, gán ảnh mặc định (tùy chọn)
-                    //product.ProductImage = "~/Content/Images/Products/default.png";
+                    product.ProductImage = imagePath;
                 }
 
                 // Mặc định đã bán = 0 khi tạo mới
@@ -123,9 +191,7 @@ namespace DoAn_web.Areas.Admin2026.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "CategoryName", product.CategoryID);
-            ViewBag.ColorID = new SelectList(db.Colors, "ColorID", "ColorName", product.ColorID);
-            ViewBag.StorageID = new SelectList(db.Storages, "StorageID", "StorageName", product.StorageID);
+            LoadProductOptions(product);
             return View(product);
         }
 
@@ -136,9 +202,7 @@ namespace DoAn_web.Areas.Admin2026.Controllers
             Product product = db.Products.Find(id);
             if (product == null) return HttpNotFound();
 
-            ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "CategoryName", product.CategoryID);
-             ViewBag.ColorID = new SelectList(db.Colors, "ColorID", "ColorName", product.ColorID);
-            ViewBag.StorageID = new SelectList(db.Storages, "StorageID", "StorageName", product.StorageID);
+            LoadProductOptions(product);
             return View(product);
         }
 
@@ -146,8 +210,9 @@ namespace DoAn_web.Areas.Admin2026.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         // Thêm tham số ImageFile để cho phép sửa ảnh
-        public ActionResult Edit([Bind(Include = "ProductID,CategoryID,ProductName,ProductDecription,ProductPrice,ProductImage,Quantity,SoldQuantity,ColorID,StorageID")] Product product, HttpPostedFileBase ImageFile)
+        public ActionResult Edit([Bind(Include = "ProductID,CategoryID,ProductName,ProductDecription,ProductPrice,Quantity,ColorID,StorageID")] Product product, HttpPostedFileBase ImageFile)
         {
+            ValidateProductInput(product);
             if (ModelState.IsValid)
             {
                 // 1. RÀNG BUỘC: KIỂM TRA TRÙNG TÊN (Trừ chính nó ra)
@@ -156,40 +221,39 @@ namespace DoAn_web.Areas.Admin2026.Controllers
                 if (isExist)
                 {
                     ModelState.AddModelError("ProductName", "Tên sản phẩm đã bị trùng với một sản phẩm khác.");
-                    ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "CategoryName", product.CategoryID);
+                    LoadProductOptions(product);
                     return View(product);
                 }
 
-                // 2. XỬ LÝ ẢNH KHI EDIT
-                if (ImageFile != null && ImageFile.ContentLength > 0)
-                {
-                    // Nếu người dùng chọn ảnh mới -> Lưu ảnh mới
-                    var fileName = Path.GetFileName(ImageFile.FileName);
-                    var fileNameWithTime = DateTime.Now.Ticks + "_" + fileName;
-                    var serverPath = Path.Combine(Server.MapPath("~/Content/Images/Products/"), fileNameWithTime);
+                var existingProduct = db.Products.Find(product.ProductID);
+                if (existingProduct == null) return HttpNotFound();
 
-                    ImageFile.SaveAs(serverPath);
-                    product.ProductImage = "~/Content/Images/Products/" + fileNameWithTime;
-                }
-                else
+                string imagePath;
+                string imageError;
+                if (!TrySaveProductImage(ImageFile, out imagePath, out imageError))
                 {
-                    // Nếu không chọn ảnh mới -> Giữ nguyên ảnh cũ
-                    // (Lưu ý: Form Edit phải có HiddenField cho ProductImage, nếu không thì phải load lại từ DB)
-                    // Cách an toàn nhất để giữ ảnh cũ nếu Bind bị null:
-                    if (string.IsNullOrEmpty(product.ProductImage))
-                    {
-                        var oldItem = db.Products.AsNoTracking().FirstOrDefault(p => p.ProductID == product.ProductID);
-                        if (oldItem != null) product.ProductImage = oldItem.ProductImage;
-                    }
+                    ModelState.AddModelError("ImageFile", imageError);
+                    product.ProductImage = existingProduct.ProductImage;
+                    LoadProductOptions(product);
+                    return View(product);
                 }
 
-                db.Entry(product).State = System.Data.Entity.EntityState.Modified;
+                existingProduct.CategoryID = product.CategoryID;
+                existingProduct.ProductName = product.ProductName;
+                existingProduct.ProductDecription = product.ProductDecription;
+                existingProduct.ProductPrice = product.ProductPrice;
+                existingProduct.Quantity = product.Quantity;
+                existingProduct.ColorID = product.ColorID;
+                existingProduct.StorageID = product.StorageID;
+                if (imagePath != null)
+                {
+                    existingProduct.ProductImage = imagePath;
+                }
+
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "CategoryName", product.CategoryID);
-            ViewBag.ColorID = new SelectList(db.Colors, "ColorID", "ColorName", product.ColorID);
-            ViewBag.StorageID = new SelectList(db.Storages, "StorageID", "StorageName", product.StorageID);
+            LoadProductOptions(product);
             return View(product);
         }
 
@@ -208,6 +272,7 @@ namespace DoAn_web.Areas.Admin2026.Controllers
         public ActionResult DeleteConfirmed(int id)
         {
             Product product = db.Products.Find(id);
+            if (product == null) return HttpNotFound();
 
             // 1. RÀNG BUỘC: KHÔNG CHO XÓA NẾU ĐÃ CÓ ĐƠN HÀNG MUA SẢN PHẨM NÀY
             // Kiểm tra trong bảng OrderDetails
@@ -220,8 +285,10 @@ namespace DoAn_web.Areas.Admin2026.Controllers
             // Xóa file ảnh cũ trên server cho sạch bộ nhớ (Tùy chọn)
             if (!string.IsNullOrEmpty(product.ProductImage))
             {
-                string fullPath = Request.MapPath(product.ProductImage);
-                if (System.IO.File.Exists(fullPath))
+                var imageDirectory = Path.GetFullPath(Server.MapPath("~/Content/Images/Products/"))
+                    .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+                var fullPath = Path.GetFullPath(Request.MapPath(product.ProductImage));
+                if (fullPath.StartsWith(imageDirectory, StringComparison.OrdinalIgnoreCase) && System.IO.File.Exists(fullPath))
                 {
                     try { System.IO.File.Delete(fullPath); } catch { /* Bỏ qua nếu lỗi xóa file */ }
                 }
