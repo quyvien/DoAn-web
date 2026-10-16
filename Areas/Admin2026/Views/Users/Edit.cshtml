@@ -1,4 +1,4 @@
-﻿@model DoAn_web.Models.User
+@model DoAn_web.ViewModels.UserAccountViewModel
 
 @{
     ViewBag.Title = "Cập nhật tài khoản";
@@ -20,6 +20,7 @@
                 @using (Html.BeginForm())
                 {
                     @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
 
                     <div class="mb-3">
                         <label class="form-label text-muted small fw-bold">TÊN ĐĂNG NHẬP (KHÔNG THỂ ĐỔI)</label>
@@ -28,13 +29,15 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Mật khẩu mới</label>
-                        @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
-                        <small class="text-muted fst-italic">Nhập mật khẩu mới để thay đổi.</small>
+                        @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control", type = "password", autocomplete = "new-password" } })
+                        @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger small" })
+                        <small class="text-muted fst-italic">Để trống nếu không muốn thay đổi mật khẩu.</small>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label fw-bold">Phân quyền</label>
                         @Html.DropDownListFor(model => model.UserRole, roleList, new { @class = "form-select" })
+                        @Html.ValidationMessageFor(model => model.UserRole, "", new { @class = "text-danger small" })
                     </div>
 
                     <div class="d-grid gap-2">

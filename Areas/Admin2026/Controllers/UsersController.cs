@@ -1,5 +1,6 @@
 ﻿using DoAn_web.Models;
-using System.Data.Entity;
+using DoAn_web.Security;
+using DoAn_web.ViewModels;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
@@ -21,28 +22,39 @@ namespace DoAn_web.Areas.Admin2026.Controllers
         // 2. TẠO TÀI KHOẢN MỚI (Ví dụ tạo thêm Admin)
         public ActionResult Create()
         {
-            return View();
+            return View(new UserAccountViewModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Username,Password,UserRole")] User user)
+        public ActionResult Create(UserAccountViewModel model)
         {
+            if (string.IsNullOrWhiteSpace(model.Password))
+            {
+                ModelState.AddModelError("Password", "Vui lòng nhập mật khẩu");
+            }
+
             if (ModelState.IsValid)
             {
                 // Kiểm tra trùng tên
-                if (db.Users.Any(u => u.Username == user.Username))
+                if (db.Users.Any(u => u.Username == model.Username))
                 {
                     ModelState.AddModelError("Username", "Tên đăng nhập này đã tồn tại.");
-                    return View(user);
+                    return View(model);
                 }
 
+                var user = new User
+                {
+                    Username = model.Username,
+                    Password = PasswordHasher.Hash(model.Password),
+                    UserRole = model.UserRole
+                };
                 db.Users.Add(user);
                 db.SaveChanges();
                 TempData["Success"] = "Đã tạo tài khoản mới thành công!";
                 return RedirectToAction("Index");
             }
-            return View(user);
+            return View(model);
         }
 
         // 3. SỬA QUYỀN HOẶC ĐỔI MẬT KHẨU
@@ -51,21 +63,33 @@ namespace DoAn_web.Areas.Admin2026.Controllers
             if (string.IsNullOrEmpty(username)) return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             User user = db.Users.Find(username); // Find theo Username
             if (user == null) return HttpNotFound();
-            return View(user);
+            return View(new UserAccountViewModel
+            {
+                Username = user.Username,
+                UserRole = user.UserRole == null ? null : user.UserRole.Trim()
+            });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Username,Password,UserRole")] User user)
+        public ActionResult Edit(UserAccountViewModel model)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(user).State = EntityState.Modified;
+                var user = db.Users.Find(model.Username);
+                if (user == null) return HttpNotFound();
+
+                user.UserRole = model.UserRole;
+                if (!string.IsNullOrWhiteSpace(model.Password))
+                {
+                    user.Password = PasswordHasher.Hash(model.Password);
+                }
+
                 db.SaveChanges();
                 TempData["Success"] = "Cập nhật tài khoản thành công!";
                 return RedirectToAction("Index");
             }
-            return View(user);
+            return View(model);
         }
 
         // 4. XÓA TÀI KHOẢN

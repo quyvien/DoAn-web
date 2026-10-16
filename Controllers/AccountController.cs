@@ -1,5 +1,6 @@
 ﻿using DoAn_web.Models;
 using DoAn_web.ViewModels;
+using DoAn_web.Security;
 using System;
 using System.Linq;
 using System.Web;
@@ -40,7 +41,7 @@ namespace DoAn_web.Controllers
                     var user = new User();
                     user.Username = model.Username;
                     user.UserRole = "C";
-                    user.Password = model.Password; // Lưu pass thường (bài tập)
+                    user.Password = PasswordHasher.Hash(model.Password);
 
                     db.Users.Add(user);
                     db.SaveChanges(); // <--- Lưu User để lấy Username
@@ -72,10 +73,9 @@ namespace DoAn_web.Controllers
                     }
                     return View(model);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    // Các lỗi khác (Lỗi kết nối DB, lỗi hệ thống...)
-                    ModelState.AddModelError("", "Lỗi hệ thống: " + ex.Message);
+                    ModelState.AddModelError("", "Không thể tạo tài khoản lúc này. Vui lòng thử lại sau.");
                     return View(model);
                 }
             }
@@ -103,8 +103,14 @@ namespace DoAn_web.Controllers
 
             if (user != null)
             {
-                if (user.Password == Password)
+                if (PasswordHasher.Verify(Password, user.Password))
                 {
+                    // Tự động nâng cấp tài khoản cũ đang lưu mật khẩu thuần sau lần đăng nhập thành công.
+                    if (!PasswordHasher.IsHashed(user.Password))
+                    {
+                        user.Password = PasswordHasher.Hash(Password);
+                        db.SaveChanges();
+                    }
                     var ticket = new FormsAuthenticationTicket(
                         1,
                         user.Username,
