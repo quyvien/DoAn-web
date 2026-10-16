@@ -128,6 +128,9 @@ namespace DoAn_web.Controllers
             var orders = db.Orders.Where(o => o.CustomerID == customerID).OrderByDescending(o => o.OrderDate).ToList();
             return View(orders);
         }
+        [HttpPost]
+        [Authorize(Roles = "C")]
+        [ValidateAntiForgeryToken]
         public ActionResult CancelOrder(int id)
         {
             //Lấy id của người dùng đang đăng nhập

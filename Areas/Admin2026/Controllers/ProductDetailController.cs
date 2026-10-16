@@ -9,6 +9,7 @@ using DoAn_web.Models; // Đổi tên này nếu namespace của bạn khác
 
 namespace DoAn_web.Areas.Admin2026.Controllers
 {
+    [Authorize(Roles = "A")]
     public class ProductDetailController : Controller
     {
         private MyStore2026Entities db = new MyStore2026Entities();

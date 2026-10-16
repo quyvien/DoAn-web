@@ -11,6 +11,7 @@ using DoAn_web.Models;
 
 namespace DoAn_web.Areas.Admin2026.Controllers
 {
+    [Authorize(Roles = "A")]
     public class CategoriesController : Controller
     {
         private MyStore2026Entities db = new MyStore2026Entities();

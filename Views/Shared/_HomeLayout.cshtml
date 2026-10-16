@@ -89,10 +89,14 @@
 
 
                     <div class="nav-item">
-                        <a href="@Url.Action("Logout", "Account")">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span class="nav-item-text">Đăng xuất</span>
-                        </a>
+                        @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { style = "display:inline" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="nav-link-button">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span class="nav-item-text">Đăng xuất</span>
+                            </button>
+                        }
                     </div>
                 }
                 else

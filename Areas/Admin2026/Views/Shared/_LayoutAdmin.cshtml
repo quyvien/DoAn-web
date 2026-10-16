@@ -61,9 +61,13 @@
 
         <div class="mt-auto">
             <hr class="text-secondary">
-            <a class="nav-link" href="@Url.Action("Logout", "Account", new { area = "" })">
-                <i class="bi bi-box-arrow-left"></i> Đăng xuất
-            </a>
+            @using (Html.BeginForm("Logout", "Account", new { area = "" }, FormMethod.Post, new { @class = "d-inline" }))
+            {
+                @Html.AntiForgeryToken()
+                <button type="submit" class="nav-link btn btn-link text-start w-100">
+                    <i class="bi bi-box-arrow-left"></i> Đăng xuất
+                </button>
+            }
         </div>
     </div>
 
@@ -81,7 +85,13 @@
                     <li><a class="dropdown-item" href="#">Hồ sơ</a></li>
                     <li><a class="dropdown-item" href="#">Cài đặt</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="@Url.Action("Logout", "Account", new { area = "" })">Đăng xuất</a></li>
+                    <li>
+                        @using (Html.BeginForm("Logout", "Account", new { area = "" }, FormMethod.Post, new { @class = "d-inline" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="dropdown-item">Đăng xuất</button>
+                        }
+                    </li>
                 </ul>
             </div>
         </nav>

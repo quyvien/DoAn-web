@@ -127,6 +127,7 @@
 
         using (Html.BeginForm("AddToCart", "Cart", FormMethod.Post))
         {
+            @Html.AntiForgeryToken()
             @Html.Hidden("productID", Model.ProductID)
 
             <div style="display: flex; align-items: center; margin-bottom: 20px;">
@@ -193,6 +194,7 @@
     decimal grandTotal = finalPrice + comboAccessoriesTotal;
 
     <form action="@Url.Action("AddComboToCart", "Cart")" method="post">
+        @Html.AntiForgeryToken()
         @Html.Hidden("productID", Model.ProductID)
         @foreach (var a in combo)
         {@Html.Hidden("accessoryIds", a.ProductID)}

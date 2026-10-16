@@ -8,6 +8,7 @@ using DoAn_web.ViewModels;
 
 namespace DoAn_web.Areas.Admin2026.Controllers
 {
+    [Authorize(Roles = "A")]
     public class HomeController : Controller
     {
         private MyStore2026Entities db = new MyStore2026Entities();

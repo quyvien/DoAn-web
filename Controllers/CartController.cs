@@ -110,6 +110,7 @@ namespace DoAn_web.Controllers
 
         // POST: /Cart/AddToCart  (thêm 1 sản phẩm)
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult AddToCart(int productID, int quantity)
         {
             bool ok = AddItemToCart(productID, quantity);
@@ -119,6 +120,7 @@ namespace DoAn_web.Controllers
 
         // POST: /Cart/AddComboToCart  (máy + 3 phụ kiện)
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult AddComboToCart(int productID, int[] accessoryIds)
         {
             // Thêm sản phẩm chính
@@ -143,7 +145,8 @@ namespace DoAn_web.Controllers
             return RedirectToAction("Index");
         }
 
-        // GET: /Cart/RemoveFromCart/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult RemoveFromCart(int productID)
         {
             List<CartItem> cart = GetCart();
@@ -160,6 +163,7 @@ namespace DoAn_web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult ChangeQuantity(int productID, int change)
         {
             List<CartItem> cart = GetCart();
@@ -194,6 +198,7 @@ namespace DoAn_web.Controllers
             return RedirectToAction("Index");
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult ChangeQuantityAjax(int productID, int change)
         {
             var cart = Session["Cart"] as List<CartItem>;
@@ -373,6 +378,8 @@ namespace DoAn_web.Controllers
         }
         // ham xu li giam gia neu co
         [HttpPost]
+        [Authorize(Roles = "C")]
+        [ValidateAntiForgeryToken]
         public ActionResult ApplyCoupon(string couponCode)
         {
             if (string.IsNullOrEmpty(couponCode))

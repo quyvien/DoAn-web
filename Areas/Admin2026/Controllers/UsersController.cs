@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 namespace DoAn_web.Areas.Admin2026.Controllers
 {
+    [Authorize(Roles = "A")]
     public class UsersController : Controller
     {
         private MyStore2026Entities db = new MyStore2026Entities();

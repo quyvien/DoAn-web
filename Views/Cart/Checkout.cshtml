@@ -60,6 +60,7 @@
                 <label style="font-weight:bold;">Mã giảm giá:</label>
                 @using (Html.BeginForm("ApplyCoupon", "Cart", FormMethod.Post))
                 {
+                    @Html.AntiForgeryToken()
                     <div style="display:flex; gap: 10px;">
                         <input type="text" name="couponCode" class="custom-input" placeholder="Nhập mã giảm giá ..." style="flex: 1;" />
                         <button type="submit" class="custom-button" style="padding: 5px 15px; width: auto; background-color:brown ;color:white;">Áp dụng</button>

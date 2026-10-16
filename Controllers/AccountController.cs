@@ -133,7 +133,8 @@ namespace DoAn_web.Controllers
             return View();
         }
 
-        // Action Logout
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Logout()
         {
             FormsAuthentication.SignOut();

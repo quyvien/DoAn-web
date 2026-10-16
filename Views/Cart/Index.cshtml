@@ -9,6 +9,7 @@
 <link href="~/Content/style_K/Style_GioHang.css" rel="stylesheet" />
 
 <div class="cart-container">
+    @Html.AntiForgeryToken()
     <h2>Giỏ hàng của bạn</h2>
 
     @* HIỂN THỊ THÔNG BÁO LỖI NẾU CÓ *@
@@ -117,10 +118,14 @@
                                 @String.Format("{0:N0}", item.TotalPrice) đ
                             </h5>
 
-                            <a href="@Url.Action("RemoveFromCart", "Cart", new { productID = item.ProductID })"
-                               onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
-                                <i class="fa fa-trash"></i> Xóa
-                            </a>
+                            @using (Html.BeginForm("RemoveFromCart", "Cart", FormMethod.Post, new { style = "display:inline" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("productID", item.ProductID)
+                                <button type="submit" class="btn-link" onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
+                                    <i class="fa fa-trash"></i> Xóa
+                                </button>
+                            }
                         </div>
                     </div>
                 }
@@ -145,7 +150,8 @@
 <script>
     function callChangeQuantity(productId, change) {
         var body = "productID=" + encodeURIComponent(productId)
-                 + "&change=" + encodeURIComponent(change);
+                 + "&change=" + encodeURIComponent(change)
+                 + "&__RequestVerificationToken=" + encodeURIComponent(document.querySelector('input[name="__RequestVerificationToken"]').value);
 
         fetch('@Url.Action("ChangeQuantityAjax", "Cart")', {
             method: 'POST',

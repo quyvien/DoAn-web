@@ -93,11 +93,14 @@
                               && order.ShippingStatus != "Đang vận chuyển"
                               && order.ShippingStatus != "Đã giao thành công")
                         {
-                            <a href="@Url.Action("CancelOrder", "Default", new { id = order.OrderID })"
-                               class="btn-cancel-order"
-                               onclick="return confirm('Bạn có muốn huỷ đơn hàng này ?')">
-                                Huỷ đơn hàng
-                            </a>
+                            using (Html.BeginForm("CancelOrder", "Default", FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("id", order.OrderID)
+                                <button type="submit" class="btn-cancel-order" onclick="return confirm('Bạn có muốn huỷ đơn hàng này?')">
+                                    Huỷ đơn hàng
+                                </button>
+                            }
                         }
                         else if (order.PaymentStatus == "Đã huỷ" || order.PaymentStatus == "Đã huỷ !")
                         {

@@ -10,6 +10,7 @@ using System.Collections.Generic; // Cần thêm namespace này cho List<SelectL
 
 namespace DoAn_web.Areas.Admin2026.Controllers
 {
+    [Authorize(Roles = "A")]
     public class OrdersController : Controller
     {
         private MyStore2026Entities db = new MyStore2026Entities();

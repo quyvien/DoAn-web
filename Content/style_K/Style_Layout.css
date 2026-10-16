@@ -129,7 +129,8 @@ display: flex;
 }
 
 /* Đây là style cho cấu trúc mới (a bao bọc i và span) */
-.nav-item a {
+.nav-item a,
+.nav-link-button {
     display: flex;
     align-items: center;
     gap: 6px; /* Khoảng cách giữa icon và chữ */
@@ -138,7 +139,15 @@ display: flex;
     font-size: 15px;
 }
 
-    .nav-item a:hover {
+    .nav-link-button {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+    }
+
+    .nav-item a:hover,
+    .nav-link-button:hover {
         text-decoration: none;
         color:yellow;
     }
@@ -335,7 +344,8 @@ display: flex;
         display: none;
     }
 
-    .nav-item a {
+    .nav-item a,
+    .nav-link-button {
         gap: 0; /* Xóa khoảng cách khi chữ bị giấu */
         font-size: 18px; /* Cho icon to hơn 1 chút */
         padding: 5px; /* Tăng vùng bấm */
