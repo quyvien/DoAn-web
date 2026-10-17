@@ -50,9 +50,15 @@ namespace DoAn_web.Areas.Admin2026.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "CategoryID,CategoryName")] Category category)
         {
+            if (string.IsNullOrWhiteSpace(category.CategoryName))
+            {
+                ModelState.AddModelError("CategoryName", "Vui lòng nhập tên danh mục.");
+            }
+
             if (ModelState.IsValid)
             {
-                bool Check = db.Categories.Any(c=>c.CategoryName.ToLower()==category.CategoryName.Trim().ToLower());
+                category.CategoryName = category.CategoryName.Trim();
+                bool Check = db.Categories.Any(c => c.CategoryName == category.CategoryName);
                 if (Check)
                 {
                     // neu co roi thi thong bao loi
@@ -91,19 +97,30 @@ namespace DoAn_web.Areas.Admin2026.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "CategoryID,CategoryName")] Category category)
         {
+            if (string.IsNullOrWhiteSpace(category.CategoryName))
+            {
+                ModelState.AddModelError("CategoryName", "Vui lòng nhập tên danh mục.");
+            }
+
             if (ModelState.IsValid)
             {
+                category.CategoryName = category.CategoryName.Trim();
                 // ktra coi co trung ten ko
-                bool CheckTen = db.Categories.Any(c => c.CategoryName.ToLower() == category.CategoryName.Trim().ToLower()
+                bool CheckTen = db.Categories.Any(c => c.CategoryName == category.CategoryName
                                                   && c.CategoryID != category.CategoryID );
                 if (CheckTen)
                 {
                     ModelState.AddModelError("CategoryName", "Tên danh mục này đã được sử dụng!error... ");
                     return View(category);
                 }
+
+                var existingCategory = db.Categories.Find(category.CategoryID);
+                if (existingCategory == null) return HttpNotFound();
+                existingCategory.CategoryName = category.CategoryName;
+                db.SaveChanges();
+                return RedirectToAction("Index");
             }
-            db.Entry(category).State = System.Data.Entity.EntityState.Modified;
-            db.SaveChanges();
+
             return View(category);
         }
 
@@ -128,10 +145,11 @@ namespace DoAn_web.Areas.Admin2026.Controllers
         public ActionResult DeleteConfirmed(int id)
         {
             Category category = db.Categories.Find(id);
+            if (category == null) return HttpNotFound();
             // kt coi co sp ko
             if (category.Products.Count > 0)
             {
-                TempData["Error"] = "Không thể xóa danh mục này vì đang có sản phẩm bên trong!error...";
+                TempData["Error"] = "Không thể xóa danh mục này vì đang có sản phẩm bên trong.";
                 return RedirectToAction("Index");
             }
             db.Categories.Remove(category);

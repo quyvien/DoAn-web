@@ -16,12 +16,13 @@ namespace DoAn_web.Areas.Admin2026.Controllers
         {
             var customers = db.Customers.AsQueryable();
 
-            if (!string.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrWhiteSpace(searchString))
             {
+                searchString = searchString.Trim();
                 // Tìm theo Tên, SĐT hoặc Email
-                customers = customers.Where(c => c.CustomerName.Contains(searchString)
-                                              || c.CustomerPhone.Contains(searchString)
-                                              || c.CustomerEmail.Contains(searchString));
+                customers = customers.Where(c => (c.CustomerName != null && c.CustomerName.Contains(searchString))
+                                              || (c.CustomerPhone != null && c.CustomerPhone.Contains(searchString))
+                                              || (c.CustomerEmail != null && c.CustomerEmail.Contains(searchString)));
             }
 
             ViewBag.CurrentFilter = searchString;
@@ -53,11 +54,20 @@ namespace DoAn_web.Areas.Admin2026.Controllers
         // 3. SỬA THÔNG TIN (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "CustomerID,CustomerName,CustomerPhone,CustomerEmail,CustomerAddress,Username")] Customer customer)
+        public ActionResult Edit([Bind(Include = "CustomerID,CustomerName,CustomerPhone,CustomerEmail,CustomerAddress")] Customer customer)
         {
+            var existingCustomer = db.Customers.Find(customer.CustomerID);
+            if (existingCustomer == null) return HttpNotFound();
+            customer.Username = existingCustomer.Username;
+
+            // Username là khóa liên kết tài khoản, không cho phép sửa từ form thông tin khách hàng.
+            ModelState.Remove("Username");
             if (ModelState.IsValid)
             {
-                db.Entry(customer).State = EntityState.Modified;
+                existingCustomer.CustomerName = customer.CustomerName;
+                existingCustomer.CustomerPhone = customer.CustomerPhone;
+                existingCustomer.CustomerEmail = customer.CustomerEmail;
+                existingCustomer.CustomerAddress = customer.CustomerAddress;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -91,6 +101,13 @@ namespace DoAn_web.Areas.Admin2026.Controllers
         public ActionResult DeleteConfirmed(int id)
         {
             Customer customer = db.Customers.Find(id);
+            if (customer == null) return HttpNotFound();
+
+            if (db.Orders.Any(o => o.CustomerID == id))
+            {
+                TempData["Error"] = "Không thể xóa khách hàng vì đang có dữ liệu đơn hàng.";
+                return RedirectToAction("Index");
+            }
 
             // Tìm tài khoản User liên kết để xóa luôn (nếu có)
             var userAccount = db.Users.FirstOrDefault(u => u.Username == customer.Username);

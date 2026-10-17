@@ -130,7 +130,9 @@ namespace DoAn_web.Areas.Admin2026.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(string username)
         {
+            if (string.IsNullOrWhiteSpace(username)) return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             User user = db.Users.Find(username);
+            if (user == null) return HttpNotFound();
 
             // Kiểm tra lại ràng buộc 1 lần nữa ở Back-end để chắc chắn (phòng trường hợp hack vượt qua UI)
             if (user.Username == User.Identity.Name)

@@ -31,20 +31,37 @@ namespace DoAn_web.Areas.Admin2026.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(ProductDetail detail)
+        public ActionResult Create([Bind(Include = "ProductID,SpecName,SpecValue,OrderIndex")] ProductDetail detail)
         {
+            if (!db.Products.Any(p => p.ProductID == detail.ProductID)) return HttpNotFound();
+            if (string.IsNullOrWhiteSpace(detail.SpecName))
+                ModelState.AddModelError("SpecName", "Vui lòng nhập tên thông số.");
+            if (string.IsNullOrWhiteSpace(detail.SpecValue))
+                ModelState.AddModelError("SpecValue", "Vui lòng nhập giá trị thông số.");
+            if (detail.OrderIndex < 0)
+                ModelState.AddModelError("OrderIndex", "Thứ tự không được âm.");
+
             if (ModelState.IsValid)
             {
+                detail.SpecName = detail.SpecName.Trim();
+                detail.SpecValue = detail.SpecValue.Trim();
                 db.ProductDetails.Add(detail);
                 db.SaveChanges();
+            }
+            else
+            {
+                TempData["Error"] = "Thông số không hợp lệ. Vui lòng kiểm tra lại dữ liệu.";
             }
             // Thêm xong thì load lại chính trang danh sách của sản phẩm đó
             return RedirectToAction("Index", new { id = detail.ProductID });
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Delete(int id)
         {
             var detail = db.ProductDetails.Find(id);
+            if (detail == null) return HttpNotFound();
             int productID = detail.ProductID; // Lưu lại ID để quay về đúng chỗ
 
             db.ProductDetails.Remove(detail);

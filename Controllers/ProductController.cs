@@ -22,11 +22,12 @@ namespace DoAn_web.Controllers
             var products = from p in db.Products
                            select p;
             // Nếu có chuỗi tìm kiếm, lọc sản phẩm
-            if (!String.IsNullOrEmpty(searchString))
+            if (!String.IsNullOrWhiteSpace(searchString))
             {
-                string searchUpper = searchString.ToUpper();
-                products = products.Where(p => p.ProductName.ToUpper().Contains(searchUpper) ||
-                                               p.ProductDecription.ToUpper().Contains(searchUpper));
+                string searchUpper = searchString.Trim().ToUpper();
+                products = products.Where(p =>
+                    (p.ProductName != null && p.ProductName.ToUpper().Contains(searchUpper)) ||
+                    (p.ProductDecription != null && p.ProductDecription.ToUpper().Contains(searchUpper)));
 
             }
             // Truyền chuỗi tìm kiếm hiện tại về View để hiển thị lại trong ô tìm kiếm
@@ -80,11 +81,13 @@ namespace DoAn_web.Controllers
         }
         public ActionResult LiveSearch( string searchString)
         {
-            if (string.IsNullOrEmpty(searchString))
+            if (string.IsNullOrWhiteSpace(searchString))
                 return new EmptyResult(); // tra ve cchuoi rong neu khong co du lieu
 
+            var normalizedSearch = searchString.Trim().ToUpper();
             var products = db.Products
-                              .Where(p => p.ProductName.ToUpper().Contains(searchString.ToUpper()))
+                              .Where(p => p.ProductName != null && p.ProductName.ToUpper().Contains(normalizedSearch))
+                              .OrderBy(p => p.ProductName)
                               .Take(5)
                               .ToList();
             return PartialView("_LiveSearchResults", products);                    
@@ -134,6 +137,15 @@ namespace DoAn_web.Controllers
         public ActionResult IpadA16()
         {
             return View();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
         }
         
     }

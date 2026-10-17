@@ -12,6 +12,10 @@
     </div>
 
     <div class="card-body">
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
         <div class="row">
             <div class="col-md-4 border-end">
                 <h6 class="fw-bold text-success mb-3">Thêm thông số mới</h6>
@@ -58,7 +62,12 @@
                                     <td class="fw-bold">@item.SpecName</td>
                                     <td>@item.SpecValue</td>
                                     <td class="text-center">
-                                        <a href="@Url.Action("Delete", new { id = item.DetailID })" class="btn btn-sm btn-danger" onclick="return confirm('Xóa dòng này?');">Xoá</a>
+                                        @using (Html.BeginForm("Delete", "ProductDetail", FormMethod.Post, new { style = "display:inline" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            @Html.Hidden("id", item.DetailID)
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xóa dòng này?');">Xoá</button>
+                                        }
                                     </td>
                                 </tr>
                             }
