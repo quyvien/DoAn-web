@@ -103,7 +103,7 @@ namespace DoAn_web.Controllers
 
             var user = db.Users.FirstOrDefault(u => u.Username == Username);
 
-            if (user != null)
+            if (user != null && !string.IsNullOrWhiteSpace(user.UserRole))
             {
                 if (PasswordHasher.Verify(Password, user.Password))
                 {
@@ -113,18 +113,31 @@ namespace DoAn_web.Controllers
                         user.Password = PasswordHasher.Hash(Password);
                         db.SaveChanges();
                     }
+                    var role = user.UserRole.Trim();
+                    if (role != "A" && role != "C")
+                    {
+                        ViewBag.LoginError = "Tài khoản không có quyền hợp lệ.";
+                        return View();
+                    }
+
                     var ticket = new FormsAuthenticationTicket(
                         1,
                         user.Username,
                         DateTime.Now,
                         DateTime.Now.AddMinutes(30),
-                        true,
-                        user.UserRole.Trim()
+                        false,
+                        role
                     );
 
                     string encryptedTicket = FormsAuthentication.Encrypt(ticket);
-                    var authCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
+                    var authCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket)
+                    {
+                        HttpOnly = true,
+                        Secure = Request.IsSecureConnection,
+                        SameSite = SameSiteMode.Lax
+                    };
                     Response.Cookies.Add(authCookie);
+                    Session["UserRole"] = role == "A" ? "Quản trị viên" : "Khách hàng";
 
                     if (!String.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
                     {

@@ -44,8 +44,27 @@ namespace DoAn_web
                 }
                 catch
                 {
-                    /// loi thi thoai
+                    FormsAuthentication.SignOut();
                 }
+            }
+        }
+
+        protected void Application_EndRequest(Object sender, EventArgs e)
+        {
+            Response.Headers["X-Content-Type-Options"] = "nosniff";
+            Response.Headers["X-Frame-Options"] = "SAMEORIGIN";
+            Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+            Response.Headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+
+            if (Request.IsSecureConnection)
+            {
+                Response.Headers["Strict-Transport-Security"] = "max-age=31536000";
+            }
+
+            if (Context.User != null && Context.User.Identity.IsAuthenticated)
+            {
+                Response.Cache.SetCacheability(HttpCacheability.NoCache);
+                Response.Cache.SetNoStore();
             }
         }
     }
