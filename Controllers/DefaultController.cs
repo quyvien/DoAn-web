@@ -5,7 +5,9 @@ using System.Web;
 using System.Web.Mvc;
 using DoAn_web.Models;
 using DoAn_web.ViewModels;
+using DoAn_web.Services;
 using System.Data.Entity;
+using System.Data;
 using System.Web.UI.WebControls.WebParts;
 
 namespace DoAn_web.Controllers
@@ -109,14 +111,14 @@ namespace DoAn_web.Controllers
             //  Gửi danh sách ĐÃ LỌC này đến View
             return View(iphones);
         }
-        private int GetCurrentCustomerID()
+        private int? GetCurrentCustomerID()
         {
             var username = User.Identity.Name;
            
             using (var db = new MyStore2026Entities())
             {
                 var customer = db.Customers.FirstOrDefault(c => c.Username == username);
-                return customer.CustomerID;
+                return customer?.CustomerID;
             }
         }
 
@@ -124,8 +126,10 @@ namespace DoAn_web.Controllers
         [Authorize(Roles = "C")] // Chỉ Customer mới xem được
         public ActionResult OrderHistory()
         {
-            int customerID = GetCurrentCustomerID(); // (Copy hàm này từ CartController sang hoặc gom vào BaseController)
-            var orders = db.Orders.Where(o => o.CustomerID == customerID).OrderByDescending(o => o.OrderDate).ToList();
+            int? customerID = GetCurrentCustomerID();
+            if (!customerID.HasValue) return new HttpStatusCodeResult(403);
+
+            var orders = db.Orders.Where(o => o.CustomerID == customerID.Value).OrderByDescending(o => o.OrderDate).ToList();
             return View(orders);
         }
         [HttpPost]
@@ -133,24 +137,24 @@ namespace DoAn_web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CancelOrder(int id)
         {
-            //Lấy id của người dùng đang đăng nhập
-            int customerId = GetCurrentCustomerID();
-            //Truy vấn db tìm cái đầu tiên nếu k thì trả về null
-            var order = db.Orders.FirstOrDefault(o => o.OrderID == id && o.CustomerID == customerId);
-            if (order != null && ((order.PaymentStatus == "Chờ xác nhận chuyển khoản" || order.PaymentStatus == "Chờ xác nhận chuyển khoảng" ||
-                                                    order.PaymentStatus == "Chờ xử lý" ||
-                                                    order.PaymentStatus == "Chưa thanh toán")) && order.ShippingStatus != "Đang vận chuyển" && order.ShippingStatus != "Đã giao thành công")
-            {
-                order.PaymentStatus = "Đã Huỷ !";
-                order.ShippingStatus = "Đã Huỷ !";
+            int? customerId = GetCurrentCustomerID();
+            if (!customerId.HasValue) return new HttpStatusCodeResult(403);
 
-                db.SaveChanges();
-                //Cập nhật 
-                TempData["SuccessMessage"] = "Order #" + id + "has been cancelled !";
-            }
-            else
+            using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
             {
-                TempData["ErrorMessage"] = "Cannot cancel this order !";
+                var order = db.Orders.Include(o => o.OrderDetails)
+                    .FirstOrDefault(o => o.OrderID == id && o.CustomerID == customerId.Value);
+
+                if (!OrderService.CanCustomerCancel(order))
+                {
+                    TempData["ErrorMessage"] = "Đơn hàng không tồn tại hoặc không còn có thể hủy.";
+                    return RedirectToAction("OrderHistory");
+                }
+
+                OrderService.CancelOrder(db, order);
+                db.SaveChanges();
+                transaction.Commit();
+                TempData["SuccessMessage"] = $"Đã hủy đơn hàng #{id} và hoàn lại tồn kho.";
             }
             return RedirectToAction("OrderHistory");
                 

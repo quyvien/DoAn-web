@@ -1,12 +1,15 @@
 ﻿// File: /Areas/Admin2026/Controllers/OrdersController.cs
 
 using DoAn_web.Models;
+using DoAn_web.Services;
 using PagedList;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
 using System.Collections.Generic; // Cần thêm namespace này cho List<SelectListItem>
+using System;
+using System.Data;
 
 namespace DoAn_web.Areas.Admin2026.Controllers
 {
@@ -50,14 +53,26 @@ namespace DoAn_web.Areas.Admin2026.Controllers
         // POST: Admin2026/Orders/Edit/5 (Lưu thay đổi trạng thái)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [ValidateInput(false)]
         public ActionResult Edit([Bind(Include = "OrderID,PaymentStatus,ShippingStatus,CustomerID")] Order order)
         {
-            var orderDB = db.Orders.Find(order.OrderID);
+            var validPaymentStatuses = new[] { "Chờ xử lý", "Chờ xác nhận chuyển khoản", "Đã thanh toán", OrderService.CancelledStatus };
+            var validShippingStatuses = new[] { "Chờ lấy hàng", "Đang vận chuyển", "Đã giao thành công", OrderService.CancelledStatus };
+            if (!validPaymentStatuses.Contains(order.PaymentStatus) || !validShippingStatuses.Contains(order.ShippingStatus))
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            var orderDB = db.Orders.Include(o => o.OrderDetails).FirstOrDefault(o => o.OrderID == order.OrderID);
 
             if (orderDB != null)
             {
-                // Kiểm tra ràng buộc: Không cho phép giao hàng thành công nếu chưa thanh toán
+                if (OrderService.IsCancelled(orderDB) && !OrderService.IsCancelled(order))
+                {
+                    ModelState.AddModelError("", "Không thể mở lại một đơn hàng đã hủy.");
+                    LoadEditViewData(orderDB);
+                    return View(orderDB);
+                }
+
                 if (order.ShippingStatus == "Đã giao thành công" && order.PaymentStatus != "Đã thanh toán")
                 {
                     ModelState.AddModelError("ShippingStatus", "Không thể hoàn tất giao hàng khi Thanh toán chưa là 'Đã thanh toán'.");
@@ -73,12 +88,21 @@ namespace DoAn_web.Areas.Admin2026.Controllers
                     return View(order);
                 }
 
-                // --- LOGIC LƯU THÀNH CÔNG ---
+                using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
+                {
+                    if (OrderService.IsCancelled(order))
+                    {
+                        OrderService.CancelOrder(db, orderDB);
+                    }
+                    else
+                    {
+                        orderDB.PaymentStatus = order.PaymentStatus;
+                        orderDB.ShippingStatus = order.ShippingStatus;
+                    }
 
-                orderDB.PaymentStatus = order.PaymentStatus;
-                orderDB.ShippingStatus = order.ShippingStatus;
-
-                db.SaveChanges();
+                    db.SaveChanges();
+                    transaction.Commit();
+                }
                 TempData["SuccessMessage"] = $"Đã cập nhật trạng thái đơn hàng #{order.OrderID} thành công!";
                 return RedirectToAction("Index");
             }
