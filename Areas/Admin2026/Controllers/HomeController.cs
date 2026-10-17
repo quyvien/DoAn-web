@@ -21,7 +21,9 @@ namespace DoAn_web.Areas.Admin2026.Controllers
             // --- 1. THỐNG KÊ SỐ LIỆU TỔNG QUÁT ---
 
             // Đếm số đơn hàng (Chỉ trừ những đơn Đã hủy)
-            model.TotalOrders = db.Orders.Count(o => o.ShippingStatus != "Đã hủy");
+            model.TotalOrders = db.Orders.Count(o => o.ShippingStatus != "Đã hủy" &&
+                                                     o.ShippingStatus != "Đã huỷ" &&
+                                                     o.ShippingStatus != "Đã Huỷ !");
 
             // Đếm tổng sản phẩm đang có
             model.TotalProducts = db.Products.Count();
@@ -33,7 +35,9 @@ namespace DoAn_web.Areas.Admin2026.Controllers
             // Logic: Cộng tiền tất cả đơn hàng chưa bị hủy (bao gồm cả chưa thanh toán và đã thanh toán)
             // Để số liệu khớp với danh sách Order
             model.TotalRevenue = db.Orders
-                .Where(o => o.ShippingStatus != "Đã hủy")
+                .Where(o => o.ShippingStatus != "Đã hủy" &&
+                            o.ShippingStatus != "Đã huỷ" &&
+                            o.ShippingStatus != "Đã Huỷ !")
                 .Sum(o => (decimal?)o.TotalAmount) ?? 0;
 
 
@@ -43,7 +47,10 @@ namespace DoAn_web.Areas.Admin2026.Controllers
 
             // Lấy dữ liệu từ DB: Gom nhóm theo Tháng
             var revenueData = db.Orders
-                .Where(o => o.OrderDate.Year == currentYear && o.ShippingStatus != "Đã hủy")
+                .Where(o => o.OrderDate.Year == currentYear &&
+                            o.ShippingStatus != "Đã hủy" &&
+                            o.ShippingStatus != "Đã huỷ" &&
+                            o.ShippingStatus != "Đã Huỷ !")
                 .GroupBy(o => o.OrderDate.Month)
                 .Select(g => new
                 {
@@ -76,6 +83,9 @@ namespace DoAn_web.Areas.Admin2026.Controllers
             ViewBag.ChartData = dataPoints;
 
             var soldData = db.OrderDetails
+                                 .Where(od => od.Order.ShippingStatus != "Đã hủy" &&
+                                              od.Order.ShippingStatus != "Đã huỷ" &&
+                                              od.Order.ShippingStatus != "Đã Huỷ !")
                                  .GroupBy(od => od.Product.Category.CategoryName)
                                  .Select(g => new {
                                      Name = g.Key,

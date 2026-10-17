@@ -8,7 +8,6 @@ using DoAn_web.ViewModels;
 using DoAn_web.Services;
 using System.Data.Entity;
 using System.Data;
-using System.Web.UI.WebControls.WebParts;
 
 namespace DoAn_web.Controllers
 {
@@ -19,80 +18,49 @@ namespace DoAn_web.Controllers
          private MyStore2026Entities db = new MyStore2026Entities();
         private void LoadFlashSalesToViewBag()
         {
-           var now = DateTime.Now;  
-            // lay cac danh sach Flashsale dang chay
+            var now = DateTime.Now;
             var activeFlashSales = db.FlashSaleItems
-                                     .Where(f=> f.IsActive && f.StartDate<=now && f.EndDate>=now)
-                                     .OrderBy(f=>f.EndDate)  /*lay cai het  han lam moc*/
+                                     .AsNoTracking()
+                                     .Include(f => f.Product)
+                                     .Where(f => f.IsActive && f.StartDate <= now && f.EndDate >= now &&
+                                                 f.SoldQuantity < f.SaleQuantityLimit)
+                                     .OrderBy(f => f.EndDate)
                                      .ToList();
-             // lay thong tin chi tiet cua sp FlashSale
-             var flashsaleProducts =( from f in activeFlashSales
-                                      join p in db.Products on f.ProductID equals p.ProductID
-                                      select new Product
-                                      {
-                                          ProductID=p.ProductID,
-                                          ProductName =p.ProductName,
-                                          ProductImage =p.ProductImage,
-                                          ProductPrice =p.ProductPrice,
-                                          
-                                      }).ToList();
-            ViewBag.FlashSaleProducts = flashsaleProducts;// hien tho list sp
-            ViewBag.FlashSales =  activeFlashSales;// hien thi gia
-            if(activeFlashSales.Count>0)
+
+            ViewBag.FlashSaleProducts = activeFlashSales.Select(f => f.Product).ToList();
+            ViewBag.FlashSales = activeFlashSales;
+            if (activeFlashSales.Count > 0)
             {
                 ViewBag.FlashSalesEndTime = activeFlashSales.First().EndDate.ToString("yyyy-MM-dd HH:mm:ss");
-
             }
         }
 
         public ActionResult Index()
         {
             LoadFlashSalesToViewBag();
-           // tao cai hop cho ViewModel
-           var viewModel = new HomeViewModel();
-
-            // lay 4 san pham iphone ra
-            viewModel.Iphones=db.Products
-                .Include(p=>p.Category)
-                .Where(p=>p.Category.CategoryName=="Iphone")// loc
-                .OrderByDescending(p=>p.ProductID)// lay sp moi nhat
-                .Take(4)// lay 4 sp
+            var categoryNames = new[] { "Iphone", "Ipad", "Mac", "Watch", "PhuKien" };
+            var products = db.Products
+                .AsNoTracking()
+                .Include(p => p.Category)
+                .Where(p => categoryNames.Contains(p.Category.CategoryName))
+                .OrderByDescending(p => p.ProductID)
                 .ToList();
 
-            // 4 sp ipad
-                        viewModel.Ipads = db.Products
-                .Include(p => p.Category)
-                .Where(p => p.Category.CategoryName == "Ipad")// loc
-                .OrderByDescending(p => p.ProductID)// lay sp moi nhat
-                .Take(4)// lay 4 sp
+            Func<string, List<Product>> newestByCategory = categoryName => products
+                .Where(p => string.Equals(p.Category.CategoryName, categoryName, StringComparison.OrdinalIgnoreCase))
+                .Take(4)
                 .ToList();
-            // 4 sp mac
-                        viewModel.Macs = db.Products
-                .Include(p => p.Category)
-                .Where(p => p.Category.CategoryName == "Mac")// loc
-                .OrderByDescending(p => p.ProductID)// lay sp moi nhat
-                .Take(4)// lay 4 sp
-                    .ToList();
-            // 4 sp watch
-                        viewModel.Watches = db.Products
-                .Include(p => p.Category)
-                .Where(p => p.Category.CategoryName == "Watch")// loc
-                .OrderByDescending(p => p.ProductID)// lay sp moi nhat
-                .Take(4)// lay 4 sp
-                .ToList();
-            // 4 sp watch
-            viewModel.PhuKiens = db.Products
-            .Include(p => p.Category)
-            .Where(p => p.Category.CategoryName == "PhuKien")// loc
-            .OrderByDescending(p => p.ProductID)// lay sp moi nhat
-            .Take(4)// lay 4 sp
-            .ToList();
-            //6 gui du lieu ve View
+
+            var viewModel = new HomeViewModel
+            {
+                Iphones = newestByCategory("Iphone"),
+                Ipads = newestByCategory("Ipad"),
+                Macs = newestByCategory("Mac"),
+                Watches = newestByCategory("Watch"),
+                PhuKiens = newestByCategory("PhuKien")
+            };
+
             return View(viewModel);
-
-
-
-
         }
        
         
@@ -114,12 +82,10 @@ namespace DoAn_web.Controllers
         private int? GetCurrentCustomerID()
         {
             var username = User.Identity.Name;
-           
-            using (var db = new MyStore2026Entities())
-            {
-                var customer = db.Customers.FirstOrDefault(c => c.Username == username);
-                return customer?.CustomerID;
-            }
+            return db.Customers
+                .Where(c => c.Username == username)
+                .Select(c => (int?)c.CustomerID)
+                .FirstOrDefault();
         }
 
         // GET: /Default/OrderHistory
@@ -301,6 +267,15 @@ namespace DoAn_web.Controllers
         public ActionResult Confirm()
         {
             return View();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
         }
         
     }
