@@ -130,7 +130,7 @@ namespace DoAn_web.Areas.Admin2026.Controllers
             products = products.OrderByDescending(p => p.ProductID);
 
             int pageSize = 10;
-            int pageNumber = (page ?? 1);
+            int pageNumber = Math.Max(1, page ?? 1);
 
             return View(products.ToPagedList(pageNumber, pageSize));
         }

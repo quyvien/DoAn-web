@@ -38,29 +38,27 @@ namespace DoAn_web.Controllers
         public ActionResult Index()
         {
             LoadFlashSalesToViewBag();
-            var categoryNames = new[] { "Iphone", "Ipad", "Mac", "Watch", "PhuKien" };
-            var products = db.Products
-                .AsNoTracking()
-                .Include(p => p.Category)
-                .Where(p => categoryNames.Contains(p.Category.CategoryName))
-                .OrderByDescending(p => p.ProductID)
-                .ToList();
-
-            Func<string, List<Product>> newestByCategory = categoryName => products
-                .Where(p => string.Equals(p.Category.CategoryName, categoryName, StringComparison.OrdinalIgnoreCase))
-                .Take(4)
-                .ToList();
-
             var viewModel = new HomeViewModel
             {
-                Iphones = newestByCategory("Iphone"),
-                Ipads = newestByCategory("Ipad"),
-                Macs = newestByCategory("Mac"),
-                Watches = newestByCategory("Watch"),
-                PhuKiens = newestByCategory("PhuKien")
+                Iphones = GetNewestProducts("Iphone"),
+                Ipads = GetNewestProducts("Ipad"),
+                Macs = GetNewestProducts("Mac"),
+                Watches = GetNewestProducts("Watch"),
+                PhuKiens = GetNewestProducts("PhuKien")
             };
 
             return View(viewModel);
+        }
+
+        private List<Product> GetNewestProducts(string categoryName)
+        {
+            // Giới hạn ngay tại SQL: trang chủ chỉ tải tối đa 20 sản phẩm.
+            return db.Products.AsNoTracking()
+                .Include(p => p.Category)
+                .Where(p => p.Category.CategoryName == categoryName)
+                .OrderByDescending(p => p.ProductID)
+                .Take(4)
+                .ToList();
         }
        
         
@@ -95,7 +93,10 @@ namespace DoAn_web.Controllers
             int? customerID = GetCurrentCustomerID();
             if (!customerID.HasValue) return new HttpStatusCodeResult(403);
 
-            var orders = db.Orders.Where(o => o.CustomerID == customerID.Value).OrderByDescending(o => o.OrderDate).ToList();
+            var orders = db.Orders.AsNoTracking()
+                .Include(o => o.OrderDetails.Select(d => d.Product))
+                .Where(o => o.CustomerID == customerID.Value)
+                .OrderByDescending(o => o.OrderDate).ThenByDescending(o => o.OrderID).ToList();
             return View(orders);
         }
         [HttpPost]
