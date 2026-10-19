@@ -27,3 +27,22 @@ foreach ($status in @('Đã hủy', 'Đã Huỷ !')) {
 }
 Assert-True (-not [DoAn_web.Services.OrderService]::CanCustomerCancel($null)) 'Don null khong the huy'
 Write-Output 'PASS: order cancellation regression checks'
+
+$password = 'MatKhauThuNghiem-123!'
+$hash = [DoAn_web.Security.PasswordHasher]::Hash($password)
+$secondHash = [DoAn_web.Security.PasswordHasher]::Hash($password)
+Assert-True ($hash -ne $secondHash) 'Moi mat khau phai co salt ngau nhien'
+Assert-True ([DoAn_web.Security.PasswordHasher]::Verify($password, $hash)) 'Mat khau dung phai duoc chap nhan'
+Assert-True (-not [DoAn_web.Security.PasswordHasher]::Verify('sai', $hash)) 'Mat khau sai phai bi tu choi'
+Assert-True ([DoAn_web.Security.PasswordHasher]::Verify($password, $password)) 'Tai khoan cu phai dang nhap duoc de nang cap'
+foreach ($invalid in @(
+    'PBKDF2$100000$$',
+    'PBKDF2$100000$AA==$AA==',
+    'PBKDF2$100000$!$!',
+    ($hash -replace '\$100000\$', '$2147483647$'),
+    ($hash -replace '\$100000\$', '$0$'),
+    ($hash + '$extra')
+)) {
+    Assert-True (-not [DoAn_web.Security.PasswordHasher]::Verify($password, $invalid)) 'Ban bam hong phai bi tu choi ma khong phat sinh exception'
+}
+Write-Output 'PASS: password verification regression checks'

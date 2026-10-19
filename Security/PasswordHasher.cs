@@ -49,7 +49,9 @@ namespace DoAn_web.Security
             byte[] salt;
             byte[] expectedHash;
 
-            if (parts.Length != 4 || !int.TryParse(parts[1], out iterations) || iterations <= 0)
+            // Chặn dữ liệu hỏng gây lỗi hoặc buộc máy chủ tính toán quá lâu.
+            if (parts.Length != 4 || !int.TryParse(parts[1], out iterations) ||
+                iterations <= 0 || iterations > 1000000 || storedValue.Length > 255)
             {
                 return false;
             }
@@ -60,6 +62,11 @@ namespace DoAn_web.Security
                 expectedHash = Convert.FromBase64String(parts[3]);
             }
             catch (FormatException)
+            {
+                return false;
+            }
+
+            if (salt.Length != SaltSize || expectedHash.Length != HashSize)
             {
                 return false;
             }

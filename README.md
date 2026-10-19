@@ -36,3 +36,13 @@ msbuild DoAn-web.sln /t:Build /p:Configuration=Release
 - Tài khoản cũ còn mật khẩu dạng thuần sẽ tự chuyển sang bản băm sau lần đăng nhập thành công đầu tiên.
 
 Không commit chuỗi kết nối chứa tài khoản/mật khẩu thật hoặc dữ liệu bí mật lên repository.
+
+## Kiểm thử hồi quy
+
+Sau khi build, chạy bằng Windows PowerShell:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File Tests/Regression.ps1
+```
+
+Các kiểm thử này không kết nối SQL Server: kiểm tra điều kiện hủy đơn, nhận diện trạng thái cũ, mật khẩu đúng/sai, salt ngẫu nhiên và bản băm bị hỏng. Cần kiểm tra tích hợp trên cơ sở dữ liệu thử nghiệm để xác nhận đặt/hủy đơn đồng thời, hoàn kho và giao diện Razor.
