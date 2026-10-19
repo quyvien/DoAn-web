@@ -10,7 +10,7 @@ namespace DoAn_web.Services
 
         public static bool IsCancelled(Order order)
         {
-            return IsCancelledStatus(order.PaymentStatus) || IsCancelledStatus(order.ShippingStatus);
+            return order != null && (IsCancelledStatus(order.PaymentStatus) || IsCancelledStatus(order.ShippingStatus));
         }
 
         public static bool CanCustomerCancel(Order order)
@@ -25,8 +25,7 @@ namespace DoAn_web.Services
                                    order.PaymentStatus == "Chờ xử lý" ||
                                    order.PaymentStatus == "Chưa thanh toán";
 
-            return canCancelPayment && order.ShippingStatus != "Đang vận chuyển" &&
-                   order.ShippingStatus != "Đã giao thành công";
+            return canCancelPayment && order.ShippingStatus == "Chờ lấy hàng";
         }
 
         public static bool CancelOrder(MyStore2026Entities db, Order order)
@@ -42,6 +41,11 @@ namespace DoAn_web.Services
                 order.PaymentStatus = CancelledStatus;
                 order.ShippingStatus = CancelledStatus;
                 return true;
+            }
+
+            if (!CanCustomerCancel(order))
+            {
+                throw new InvalidOperationException("Đơn hàng không còn có thể hủy.");
             }
 
             foreach (var detail in order.OrderDetails)

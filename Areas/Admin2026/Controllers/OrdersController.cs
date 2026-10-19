@@ -53,7 +53,7 @@ namespace DoAn_web.Areas.Admin2026.Controllers
         // POST: Admin2026/Orders/Edit/5 (Lưu thay đổi trạng thái)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "OrderID,PaymentStatus,ShippingStatus,CustomerID")] Order order)
+        public ActionResult Edit([Bind(Include = "OrderID,PaymentStatus,ShippingStatus")] Order order)
         {
             var validPaymentStatuses = new[] { "Chờ xử lý", "Chờ xác nhận chuyển khoản", "Đã thanh toán", OrderService.CancelledStatus };
             var validShippingStatuses = new[] { "Chờ lấy hàng", "Đang vận chuyển", "Đã giao thành công", OrderService.CancelledStatus };
@@ -62,10 +62,20 @@ namespace DoAn_web.Areas.Admin2026.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
+            // Đọc và cập nhật trong cùng giao dịch để tránh hoàn kho hai lần khi hủy đồng thời.
+            using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
+            {
             var orderDB = db.Orders.Include(o => o.OrderDetails).FirstOrDefault(o => o.OrderID == order.OrderID);
 
             if (orderDB != null)
             {
+                if (OrderService.IsCancelled(order) && !OrderService.IsCancelled(orderDB) &&
+                    !OrderService.CanCustomerCancel(orderDB))
+                {
+                    ModelState.AddModelError("", "Chỉ có thể hủy đơn chưa thanh toán và đang chờ lấy hàng.");
+                    LoadEditViewData(orderDB);
+                    return View(orderDB);
+                }
                 if (OrderService.IsCancelled(orderDB) && !OrderService.IsCancelled(order))
                 {
                     ModelState.AddModelError("", "Không thể mở lại một đơn hàng đã hủy.");
@@ -81,6 +91,7 @@ namespace DoAn_web.Areas.Admin2026.Controllers
                     order.OrderDate = orderDB.OrderDate;       // Lấy lại ngày đặt
                     order.TotalAmount = orderDB.TotalAmount;   // Lấy lại tổng tiền
                     order.AddressDelivery = orderDB.AddressDelivery; // Lấy lại địa chỉ
+                    order.CustomerID = orderDB.CustomerID;
 
                     // BƯỚC 2: Tải các quan hệ (Customer, OrderDetails)
                     LoadEditViewData(order);
@@ -88,8 +99,6 @@ namespace DoAn_web.Areas.Admin2026.Controllers
                     return View(order);
                 }
 
-                using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
-                {
                     if (OrderService.IsCancelled(order))
                     {
                         OrderService.CancelOrder(db, orderDB);
@@ -102,13 +111,13 @@ namespace DoAn_web.Areas.Admin2026.Controllers
 
                     db.SaveChanges();
                     transaction.Commit();
-                }
                 TempData["SuccessMessage"] = $"Đã cập nhật trạng thái đơn hàng #{order.OrderID} thành công!";
                 return RedirectToAction("Index");
             }
 
             // Nếu đơn hàng không tồn tại, quay về Index
-            return RedirectToAction("Index");
+            return HttpNotFound();
+            }
         }
 
         // ... Các Action khác (Index, Dispose) ...

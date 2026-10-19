@@ -10,6 +10,14 @@
 <div class="history-container">
     <h2>Lịch sử mua hàng</h2>
     <hr />
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div role="status">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div role="alert">@TempData["ErrorMessage"]</div>
+    }
 
     @if (Model == null || !Model.Any())
     {
@@ -86,12 +94,7 @@
 
                     <!-- Footer: nút huỷ đơn -->
                     <div class="action-footer">
-                        @if ((order.PaymentStatus == "Chờ xác nhận chuyển khoản"
-                              || order.PaymentStatus == "Chờ xác nhận chuyển khoảng"
-                              || order.PaymentStatus == "Chờ xử lý"
-                              || order.PaymentStatus == "Chưa thanh toán")
-                              && order.ShippingStatus != "Đang vận chuyển"
-                              && order.ShippingStatus != "Đã giao thành công")
+                        @if (DoAn_web.Services.OrderService.CanCustomerCancel(order))
                         {
                             using (Html.BeginForm("CancelOrder", "Default", FormMethod.Post))
                             {
@@ -102,7 +105,7 @@
                                 </button>
                             }
                         }
-                        else if (order.PaymentStatus == "Đã hủy" || order.PaymentStatus == "Đã huỷ" || order.PaymentStatus == "Đã huỷ !")
+                        else if (DoAn_web.Services.OrderService.IsCancelled(order))
                         {
                             <span style="color: #999; font-style: italic;">
                                 Đơn hàng đã được hủy
