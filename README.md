@@ -46,3 +46,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File Tests/Regression.ps1
 ```
 
 Các kiểm thử này không kết nối SQL Server: kiểm tra điều kiện hủy đơn, nhận diện trạng thái cũ, mật khẩu đúng/sai, salt ngẫu nhiên và bản băm bị hỏng. Cần kiểm tra tích hợp trên cơ sở dữ liệu thử nghiệm để xác nhận đặt/hủy đơn đồng thời, hoàn kho và giao diện Razor.
+
+Khi ứng dụng đã chạy và có sản phẩm tồn kho ít nhất hai đơn vị, kiểm tra HTTP cho trang chủ và giỏ hàng:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File Tests/CartSmoke.ps1 -BaseUrl http://localhost:63723
+```
+
+Script dùng phiên giỏ hàng riêng, kiểm tra thêm/sửa/xóa, tổng tiền và yêu cầu gây tràn số; không tạo đơn hay cập nhật tồn kho. Kiểm tra này không thay thế việc kiểm tra tương tác JavaScript trong trình duyệt.

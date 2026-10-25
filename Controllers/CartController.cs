@@ -47,10 +47,10 @@ namespace DoAn_web.Controllers
             var productDB = db.Products.Find(productID);
 
             // Tính số lượng sau khi cộng thêm
-            int requiredQuantity = quantity;
+            long requiredQuantity = quantity;
             if (item != null)
             {
-                requiredQuantity = item.Quantity + quantity;
+                requiredQuantity = (long)item.Quantity + quantity;
             }
 
             // Kiểm tra tồn kho
@@ -184,7 +184,7 @@ namespace DoAn_web.Controllers
             if (productDB == null)
                 return RedirectToAction("Index");
 
-            int newQuantity = item.Quantity + change;
+            long newQuantity = (long)item.Quantity + change;
 
             if (newQuantity <= 0)
             {
@@ -199,8 +199,11 @@ namespace DoAn_web.Controllers
                 return RedirectToAction("Index");
             }
 
-            item.Quantity = newQuantity;
-            RefreshCartPrices(cart, DateTime.Now);
+            item.Quantity = (int)newQuantity;
+            var sale = FindAvailableFlashSale(productID, item.Quantity, DateTime.Now);
+            item.UnitPrice = sale == null ? productDB.ProductPrice : sale.SalePrice;
+            item.OriginalPrice = productDB.ProductPrice;
+            SaveCart(cart);
 
             return RedirectToAction("Index");
         }
@@ -213,7 +216,7 @@ namespace DoAn_web.Controllers
                 return Json(new { success = false, message = "Giỏ hàng trống" },
                             JsonRequestBehavior.AllowGet);
 
-            var item = cart.FirstOrDefault(x => x.ProductID == productID);
+            var item = cart.FirstOrDefault(x => x != null && x.ProductID == productID);
             if (item == null)
                 return Json(new { success = false, message = "Không tìm thấy sản phẩm" },
                             JsonRequestBehavior.AllowGet);
@@ -222,20 +225,26 @@ namespace DoAn_web.Controllers
             if (product == null)
                 return Json(new { success = false, message = "Sản phẩm không còn tồn tại" });
 
-            var newQuantity = Math.Max(1, item.Quantity + change);
+            var newQuantity = Math.Max(1L, (long)item.Quantity + change);
             if (newQuantity > product.Quantity)
                 return Json(new { success = false, message = $"Sản phẩm chỉ còn {product.Quantity} sản phẩm" });
 
-            item.Quantity = newQuantity;
-            RefreshCartPrices(cart, DateTime.Now);
+            item.Quantity = (int)newQuantity;
+            // Chỉ cập nhật dòng đang sửa; một sản phẩm khác hết hàng không làm hỏng phản hồi AJAX.
+            var sale = FindAvailableFlashSale(productID, item.Quantity, DateTime.Now);
+            item.UnitPrice = sale == null ? product.ProductPrice : sale.SalePrice;
+            item.OriginalPrice = product.ProductPrice;
+            SaveCart(cart);
 
-            decimal cartTotal = cart.Sum(x => x.TotalPrice);
+            decimal cartTotal = cart.Where(x => x != null).Sum(x => x.TotalPrice);
 
             return Json(new
             {
                 success = true,
                 productID = productID,
                 quantity = item.Quantity,
+                unitPrice = item.UnitPrice,
+                originalPrice = item.OriginalPrice,
                 itemTotal = item.TotalPrice,
                 cartTotal = cartTotal
             }, JsonRequestBehavior.AllowGet);
@@ -423,7 +432,7 @@ namespace DoAn_web.Controllers
                 f.IsActive &&
                 f.StartDate <= now &&
                 f.EndDate >= now &&
-                f.SoldQuantity + quantity <= f.SaleQuantityLimit);
+                (long)f.SoldQuantity + quantity <= f.SaleQuantityLimit);
         }
 
         private void RefreshCartPrices(List<CartItem> cart, DateTime now)
